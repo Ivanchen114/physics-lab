@@ -16,15 +16,14 @@ const topics = [
     tagColor: 'bg-indigo-600',
     description: '點擊查看漫畫與互動模擬。',
     comics: [
-    { file: './comics/光電效應/1.png', title: '1' },
-    { file: './comics/光電效應/2.png', title: '2' },
-    { file: './comics/光電效應/3.png', title: '3' },
-    { file: './comics/光電效應/4.png', title: '4' },
-    { file: './comics/光電效應/5.png', title: '5' },
-    { file: './comics/光電效應/6.png', title: '6' },
-    { file: './comics/光電效應/7.png', title: '7' },
-    { file: './comics/光電效應/8.png', title: '8' },
-    { file: './comics/光電效應/Gemini_Generated_Image_n1mb8kn1mb8kn1mb.png', title: 'Gemini Generated Image n1mb8kn1mb8kn1mb' }
+    { file: './comics/光電效應/1_金屬夜店門口.png', title: '金屬夜店門口' },
+    { file: './comics/光電效應/2_波動說的預測.png', title: '波動說的預測' },
+    { file: './comics/光電效應/3_等待.png', title: '等待' },
+    { file: './comics/光電效應/4_頻率才是關鍵.png', title: '頻率才是關鍵' },
+    { file: './comics/光電效應/5_光子保鑣登場.png', title: '光子保鑣登場' },
+    { file: './comics/光電效應/6_剛好過門檻.png', title: '剛好過門檻' },
+    { file: './comics/光電效應/7_停止電壓.png', title: '停止電壓' },
+    { file: './comics/光電效應/8_愛因斯坦的諾貝爾獎.png', title: '愛因斯坦的諾貝爾獎' }
     ],
     Simulation: 光電效應Simulation,
   },
