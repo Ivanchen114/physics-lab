@@ -1,8 +1,30 @@
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 
 export default function ComicViewer({ comics = [] }) {
+  const viewerRef = useRef(null)
   const [current, setCurrent] = useState(0)
   const [isFullscreen, setIsFullscreen] = useState(false)
+
+  // 監聽全螢幕狀態變化
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement)
+    }
+    document.addEventListener('fullscreenchange', handleFullscreenChange)
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange)
+  }, [])
+
+  // 切換全螢幕
+  const toggleFullscreen = () => {
+    if (!viewerRef.current) return
+    if (!document.fullscreenElement) {
+      viewerRef.current.requestFullscreen().catch(err => {
+        console.error(`Error attempting to enable full-screen mode: ${err.message}`)
+      })
+    } else {
+      document.exitFullscreen()
+    }
+  }
 
   // 觸控滑動支援
   const touchStartX = useRef(null)
@@ -21,7 +43,7 @@ export default function ComicViewer({ comics = [] }) {
   const handleKey = useCallback((e) => {
     if (e.key === 'ArrowLeft')  goPrev()
     if (e.key === 'ArrowRight') goNext()
-    if (e.key === 'Escape')     setIsFullscreen(false)
+    if (e.key === 'Escape' && !document.fullscreenElement) setIsFullscreen(false)
   }, [goPrev, goNext])
 
   if (!comics.length) return null
@@ -31,9 +53,10 @@ export default function ComicViewer({ comics = [] }) {
     <div className="comic-viewer flex flex-col gap-3">
       {/* 主圖區 */}
       <div
-        className={`relative bg-gray-900 rounded-xl overflow-hidden border border-gray-800
+        ref={viewerRef}
+        className={`relative bg-gray-900 rounded-xl overflow-hidden border border-gray-800 transition-all
           ${isFullscreen
-            ? 'fixed inset-0 z-50 rounded-none bg-black flex items-center justify-center'
+            ? 'w-full h-full bg-black flex items-center justify-center'
             : ''
           }`}
         onTouchStart={onTouchStart}
@@ -78,10 +101,10 @@ export default function ComicViewer({ comics = [] }) {
 
         {/* 全螢幕按鈕 */}
         <button
-          onClick={() => setIsFullscreen(f => !f)}
+          onClick={toggleFullscreen}
           className="absolute top-2 right-2 bg-gray-900/70 hover:bg-gray-700
                      text-gray-300 hover:text-white rounded-lg px-2 py-1
-                     text-xs transition-colors"
+                     text-xs transition-colors z-20"
         >
           {isFullscreen ? '✕ 關閉' : '⛶ 全螢幕'}
         </button>
