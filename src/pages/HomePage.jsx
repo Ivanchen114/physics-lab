@@ -3,7 +3,22 @@ import topics from '../topicsConfig'
 export default function HomePage({ onSelectTopic }) {
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Hero 標題區 */}
+
+      {/* ── 頂部學校標識帶 ────────────────────────── */}
+      <div className="bg-gray-950 border-b border-gray-800 px-6 py-2">
+        <div className="max-w-5xl mx-auto flex items-center gap-3">
+          <img
+            src="./songshan-logo.svg"
+            alt="松山高中校徽"
+            className="h-7 w-auto opacity-80"
+          />
+          <span className="text-gray-400 text-sm tracking-wide">
+            臺北市立松山高級中學
+          </span>
+        </div>
+      </div>
+
+      {/* ── Hero 標題區 ───────────────────────────── */}
       <header className="relative overflow-hidden bg-gradient-to-br from-gray-900 via-indigo-950 to-gray-900 py-16 px-6 text-center">
         {/* 裝飾背景圓 */}
         <div className="absolute inset-0 opacity-10 pointer-events-none">
@@ -12,11 +27,25 @@ export default function HomePage({ onSelectTopic }) {
         </div>
 
         <div className="relative z-10 max-w-3xl mx-auto">
+          {/* 學校徽章 */}
+          <div className="inline-flex items-center gap-2.5 bg-white/10 backdrop-blur-sm
+                          border border-white/20 rounded-full px-5 py-2 mb-7">
+            <img
+              src="./songshan-logo.svg"
+              alt="松山高中校徽"
+              className="h-5 w-auto"
+            />
+            <span className="text-indigo-200 text-sm font-semibold tracking-widest">
+              松山高中
+            </span>
+          </div>
+
+          {/* 主標題 */}
           <p className="text-5xl mb-4">🔬</p>
-          <h1 className="text-4xl md:text-5xl font-black tracking-tight text-white mb-3">
+          <h1 className="text-4xl md:text-5xl font-black tracking-tight text-white mb-2">
             物理漫遊實驗室
           </h1>
-          <p className="text-lg text-indigo-200 font-medium mb-1">
+          <p className="text-base text-indigo-300 font-medium mb-1 tracking-widest">
             Physics Exploration Lab
           </p>
           <p className="text-gray-400 mt-4 text-base max-w-xl mx-auto leading-relaxed">
@@ -26,7 +55,7 @@ export default function HomePage({ onSelectTopic }) {
         </div>
       </header>
 
-      {/* 主題卡片牆 */}
+      {/* ── 主題卡片牆 ───────────────────────────── */}
       <main className="flex-1 max-w-5xl mx-auto w-full px-4 py-10">
         <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-widest mb-6">
           探索主題 · {topics.length} 個單元
@@ -42,10 +71,28 @@ export default function HomePage({ onSelectTopic }) {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-gray-800 py-6 text-center text-gray-500 text-sm">
-        物理漫遊實驗室 · 漫畫由 Gemini 生成 · 模擬由 Claude 開發
+      {/* ── Footer ──────────────────────────────── */}
+      <footer className="border-t border-gray-800 bg-gray-950">
+        <div className="max-w-5xl mx-auto px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+          {/* 左：學校資訊 */}
+          <div className="flex items-center gap-3">
+            <img
+              src="./songshan-logo.svg"
+              alt="松山高中校徽"
+              className="h-9 w-auto opacity-75"
+            />
+            <div className="text-left">
+              <p className="text-gray-300 text-sm font-semibold">臺北市立松山高級中學</p>
+              <p className="text-gray-500 text-xs mt-0.5">物理漫遊實驗室 · Physics Exploration Lab</p>
+            </div>
+          </div>
+          {/* 右：製作資訊 */}
+          <p className="text-gray-600 text-xs text-center sm:text-right leading-relaxed">
+            漫畫由 Gemini 生成<br className="hidden sm:block" /> 模擬由 Claude 開發
+          </p>
+        </div>
       </footer>
+
     </div>
   )
 }
