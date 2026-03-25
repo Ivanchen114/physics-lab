@@ -1,0 +1,12 @@
+// vite.config.js
+import { defineConfig } from "file:///sessions/kind-cool-maxwell/mnt/%E7%89%A9%E7%90%86%E6%BC%AB%E9%81%8A%E5%AF%A6%E9%A9%97%E5%AE%A4%20(1)/website/node_modules/vite/dist/node/index.js";
+import react from "file:///sessions/kind-cool-maxwell/mnt/%E7%89%A9%E7%90%86%E6%BC%AB%E9%81%8A%E5%AF%A6%E9%A9%97%E5%AE%A4%20(1)/website/node_modules/@vitejs/plugin-react/dist/index.js";
+var vite_config_default = defineConfig({
+  plugins: [react()],
+  base: "./"
+  // 方便部署到任何路徑
+});
+export {
+  vite_config_default as default
+};
+//# sourceMappingURL=data:application/json;base64,ewogICJ2ZXJzaW9uIjogMywKICAic291cmNlcyI6IFsidml0ZS5jb25maWcuanMiXSwKICAic291cmNlc0NvbnRlbnQiOiBbImNvbnN0IF9fdml0ZV9pbmplY3RlZF9vcmlnaW5hbF9kaXJuYW1lID0gXCIvc2Vzc2lvbnMva2luZC1jb29sLW1heHdlbGwvbW50L1x1NzI2OVx1NzQwNlx1NkYyQlx1OTA0QVx1NUJFNlx1OUE1N1x1NUJBNCAoMSkvd2Vic2l0ZVwiO2NvbnN0IF9fdml0ZV9pbmplY3RlZF9vcmlnaW5hbF9maWxlbmFtZSA9IFwiL3Nlc3Npb25zL2tpbmQtY29vbC1tYXh3ZWxsL21udC9cdTcyNjlcdTc0MDZcdTZGMkJcdTkwNEFcdTVCRTZcdTlBNTdcdTVCQTQgKDEpL3dlYnNpdGUvdml0ZS5jb25maWcuanNcIjtjb25zdCBfX3ZpdGVfaW5qZWN0ZWRfb3JpZ2luYWxfaW1wb3J0X21ldGFfdXJsID0gXCJmaWxlOi8vL3Nlc3Npb25zL2tpbmQtY29vbC1tYXh3ZWxsL21udC8lRTclODklQTklRTclOTAlODYlRTYlQkMlQUIlRTklODElOEElRTUlQUYlQTYlRTklQTklOTclRTUlQUUlQTQlMjAoMSkvd2Vic2l0ZS92aXRlLmNvbmZpZy5qc1wiO2ltcG9ydCB7IGRlZmluZUNvbmZpZyB9IGZyb20gJ3ZpdGUnXG5pbXBvcnQgcmVhY3QgZnJvbSAnQHZpdGVqcy9wbHVnaW4tcmVhY3QnXG5cbmV4cG9ydCBkZWZhdWx0IGRlZmluZUNvbmZpZyh7XG4gIHBsdWdpbnM6IFtyZWFjdCgpXSxcbiAgYmFzZTogJy4vJywgLy8gXHU2NUI5XHU0RkJGXHU5MEU4XHU3RjcyXHU1MjMwXHU0RUZCXHU0RjU1XHU4REVGXHU1RjkxXG59KVxuIl0sCiAgIm1hcHBpbmdzIjogIjtBQUFxWSxTQUFTLG9CQUFvQjtBQUNsYSxPQUFPLFdBQVc7QUFFbEIsSUFBTyxzQkFBUSxhQUFhO0FBQUEsRUFDMUIsU0FBUyxDQUFDLE1BQU0sQ0FBQztBQUFBLEVBQ2pCLE1BQU07QUFBQTtBQUNSLENBQUM7IiwKICAibmFtZXMiOiBbXQp9Cg==
