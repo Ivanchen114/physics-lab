@@ -4,6 +4,7 @@
 // =============================================
 
 import BlackbodySimulation from './simulations/BlackbodySimulation'
+import PhotoelectricSimulation from './simulations/PhotoelectricSimulation'
 
 const topics = [
   {
@@ -24,19 +25,26 @@ const topics = [
     ],
     Simulation: BlackbodySimulation,
   },
-
-  // ---- 新增主題範例（取消註解並填寫）----
-  // {
-  //   id: 'photoelectric',
-  //   title: '光電效應',
-  //   subtitle: '愛因斯坦的光子革命',
-  //   emoji: '⚡',
-  //   tag: '量子物理',
-  //   tagColor: 'bg-yellow-600',
-  //   description: '...',
-  //   comics: [ ... ],
-  //   Simulation: PhotoelectricSimulation,
-  // },
+  {
+    id: 'photoelectric',
+    title: '光電效應',
+    subtitle: '愛因斯坦的光子革命',
+    emoji: '⚡',
+    tag: '量子物理',
+    tagColor: 'bg-yellow-500',
+    description: '用金屬夜店的類比，跟著老師走進去，親眼見證波動說的失敗與光子說的誕生，理解為什麼光是一顆一顆的。',
+    comics: [
+      { file: './comics/光電效應/01_金屬夜店門口.png',     title: '第一幕：金屬夜店門口' },
+      { file: './comics/光電效應/02_波動說的預測.png',     title: '第二幕：波動說的預測' },
+      { file: './comics/光電效應/03_等待.png',             title: '第三幕：等待' },
+      { file: './comics/光電效應/04_頻率才是關鍵.png',     title: '第四幕：頻率才是關鍵' },
+      { file: './comics/光電效應/05_光子保鑣登場.png',     title: '第五幕：光子保鑣登場' },
+      { file: './comics/光電效應/06_剛好過門檻.png',       title: '第六幕：剛好過門檻' },
+      { file: './comics/光電效應/07_停止電壓.png',         title: '第七幕：停止電壓' },
+      { file: './comics/光電效應/08_愛因斯坦的諾貝爾獎.png', title: '第八幕：愛因斯坦的諾貝爾獎' },
+    ],
+    Simulation: PhotoelectricSimulation,
+  },
 ]
 
 export default topics
