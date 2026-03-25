@@ -31,10 +31,10 @@ export default function TopicPage({ topic, onBack }) {
         </div>
       </div>
 
-      {/* 手機版：Tab 切換（漫畫 / 模擬） */}
-      <div className="xl:hidden flex border-b border-gray-800 bg-gray-900">
+      {/* Tab 切換（漫畫 / 模擬） */}
+      <div className="flex border-b border-gray-800 bg-gray-900">
         <TabBtn active={tab === 'comic'} onClick={() => setTab('comic')}>
-          🖼 漫畫
+          🖼 漫畫說明
         </TabBtn>
         <TabBtn active={tab === 'sim'} onClick={() => setTab('sim')}>
           🎮 互動模擬
@@ -42,31 +42,17 @@ export default function TopicPage({ topic, onBack }) {
       </div>
 
       {/* 內容區 */}
-      <div className="flex-1 max-w-7xl mx-auto w-full px-3 py-5">
-
-        {/* 桌機版：左右並排 */}
-        <div className="hidden xl:grid xl:grid-cols-2 gap-6">
+      <div className="flex-1 max-w-5xl mx-auto w-full px-4 py-6">
+        {tab === 'comic' && (
           <Section title="📖 漫畫說明">
             <ComicViewer comics={comics} />
           </Section>
+        )}
+        {tab === 'sim' && (
           <Section title="🎮 互動模擬">
             {Simulation ? <Simulation /> : <NoSim />}
           </Section>
-        </div>
-
-        {/* 手機版：依 Tab 顯示 */}
-        <div className="xl:hidden">
-          {tab === 'comic' && (
-            <Section title="📖 漫畫說明">
-              <ComicViewer comics={comics} />
-            </Section>
-          )}
-          {tab === 'sim' && (
-            <Section title="🎮 互動模擬">
-              {Simulation ? <Simulation /> : <NoSim />}
-            </Section>
-          )}
-        </div>
+        )}
       </div>
     </div>
   )

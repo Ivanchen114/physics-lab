@@ -39,7 +39,7 @@ function makeElectron(y, keMax) {
   return {
     x: 0,
     y,
-    vx: speed * Math.cos(angle),
+    vx: -(speed * Math.cos(angle)), // 往左飛（光子從左打來，電子從左側逸出）
     vy: speed * Math.sin(angle),
     life: 0,
     maxLife: 80 + Math.random() * 40,
@@ -232,22 +232,38 @@ export default function PhotoelectricSimulation() {
           addFlash(p.y);
           if (canEmit) {
             const e = makeElectron(p.y, keMax);
-            e.x = METAL_X + METAL_W / 2;
+            e.x = METAL_X - METAL_W / 2; // 從金屬左側逸出
             electronsRef.current.push(e);
           }
           return false;
         }
-        const glow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, 8);
-        glow.addColorStop(0, freqInfo.color + "CC");
+        // 光子：星芒形狀（暗示電磁波本質）
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        // 外圍光暈
+        const glow = ctx.createRadialGradient(0, 0, 0, 0, 0, 10);
+        glow.addColorStop(0, freqInfo.color + "AA");
         glow.addColorStop(1, "transparent");
         ctx.fillStyle = glow;
         ctx.beginPath();
-        ctx.arc(p.x, p.y, 8, 0, Math.PI * 2);
+        ctx.arc(0, 0, 10, 0, Math.PI * 2);
         ctx.fill();
+        // 中心亮點
         ctx.beginPath();
-        ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+        ctx.arc(0, 0, 2.5, 0, Math.PI * 2);
         ctx.fillStyle = "#fff";
         ctx.fill();
+        // 放射短線（6條）
+        ctx.strokeStyle = freqInfo.color;
+        ctx.lineWidth = 1.2;
+        for (let i = 0; i < 6; i++) {
+          const a = (i * Math.PI) / 3;
+          ctx.beginPath();
+          ctx.moveTo(Math.cos(a) * 4, Math.sin(a) * 4);
+          ctx.lineTo(Math.cos(a) * 9, Math.sin(a) * 9);
+          ctx.stroke();
+        }
+        ctx.restore();
         return true;
       });
 
@@ -271,19 +287,27 @@ export default function PhotoelectricSimulation() {
         e.x   += e.vx;
         e.y   += e.vy;
         e.life++;
-        if (e.x > W || e.life > e.maxLife) return false;
+        if (e.x < 0 || e.life > e.maxLife) return false;
+        // 電子：實心藍色圓 + 白色外環（粒子感）
         const alpha = Math.max(0, 1 - e.life / e.maxLife);
-        const eg = ctx.createRadialGradient(e.x, e.y, 0, e.x, e.y, 7);
-        eg.addColorStop(0, `rgba(100,200,255,${alpha})`);
-        eg.addColorStop(1, "transparent");
-        ctx.fillStyle = eg;
+        ctx.save();
+        // 外環
         ctx.beginPath();
         ctx.arc(e.x, e.y, 7, 0, Math.PI * 2);
-        ctx.fill();
+        ctx.strokeStyle = `rgba(180,230,255,${alpha})`;
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+        // 實心藍色核心
         ctx.beginPath();
-        ctx.arc(e.x, e.y, 2.5, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(220,240,255,${alpha})`;
+        ctx.arc(e.x, e.y, 4, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(60,160,255,${alpha})`;
         ctx.fill();
+        // 中心白點
+        ctx.beginPath();
+        ctx.arc(e.x, e.y, 1.5, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255,255,255,${alpha})`;
+        ctx.fill();
+        ctx.restore();
         return true;
       });
 
