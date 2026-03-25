@@ -7,11 +7,13 @@ export default function HomePage({ onSelectTopic }) {
       {/* ── 頂部學校標識帶 ────────────────────────── */}
       <div className="bg-gray-950 border-b border-gray-800 px-6 py-2">
         <div className="max-w-5xl mx-auto flex items-center gap-3">
-          <img
-            src="./songshan-logo.svg"
-            alt="松山高中校徽"
-            className="h-7 w-auto opacity-80"
-          />
+          <div className="bg-white rounded-full p-0.5 flex-shrink-0">
+            <img
+              src="./songshan-logo.svg"
+              alt="松山高中校徽"
+              className="h-6 w-auto"
+            />
+          </div>
           <span className="text-gray-400 text-sm tracking-wide">
             臺北市立松山高級中學
           </span>
@@ -30,11 +32,13 @@ export default function HomePage({ onSelectTopic }) {
           {/* 學校徽章 */}
           <div className="inline-flex items-center gap-2.5 bg-white/10 backdrop-blur-sm
                           border border-white/20 rounded-full px-5 py-2 mb-7">
-            <img
-              src="./songshan-logo.svg"
-              alt="松山高中校徽"
-              className="h-5 w-auto"
-            />
+            <div className="bg-white rounded-full p-0.5 flex-shrink-0">
+              <img
+                src="./songshan-logo.svg"
+                alt="松山高中校徽"
+                className="h-4 w-auto"
+              />
+            </div>
             <span className="text-indigo-200 text-sm font-semibold tracking-widest">
               松山高中
             </span>
@@ -76,11 +80,13 @@ export default function HomePage({ onSelectTopic }) {
         <div className="max-w-5xl mx-auto px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           {/* 左：學校資訊 */}
           <div className="flex items-center gap-3">
-            <img
-              src="./songshan-logo.svg"
-              alt="松山高中校徽"
-              className="h-9 w-auto opacity-75"
-            />
+            <div className="bg-white rounded-full p-1 flex-shrink-0">
+              <img
+                src="./songshan-logo.svg"
+                alt="松山高中校徽"
+                className="h-8 w-auto"
+              />
+            </div>
             <div className="text-left">
               <p className="text-gray-300 text-sm font-semibold">臺北市立松山高級中學</p>
               <p className="text-gray-500 text-xs mt-0.5">物理漫遊實驗室 · Physics Exploration Lab</p>
