@@ -41,14 +41,14 @@ const topics = [
     tagColor: 'bg-purple-600',
     description: '用園遊會扭蛋機類比，理解普朗克如何用「能量量子化」解決紫外災難，推開量子力學的大門。',
     comics: [
-    { file: './comics/黑體輻射/1_黑體園遊會登場.png', title: '黑體園遊會登場' },
-    { file: './comics/黑體輻射/2_為什麼高頻區的機台比較多？.png', title: '為什麼高頻區的機台比較多？' },
-    { file: './comics/黑體輻射/3_園遊會的物理翻譯.png', title: '園遊會的物理翻譯' },
-    { file: './comics/黑體輻射/4_古典物理：能量可以無限切分.png', title: '古典物理：能量可以無限切分' },
-    { file: './comics/黑體輻射/5_紫外災難爆發.png', title: '紫外災難爆發' },
-    { file: './comics/黑體輻射/6_普朗克的規則：不找零、不切割.png', title: '普朗克的規則：不找零、不切割' },
-    { file: './comics/黑體輻射/7_波茲曼的冷酷現實.png', title: '波茲曼的冷酷現實' },
-    { file: './comics/黑體輻射/8_完美的黑體輻射曲線.png', title: '完美的黑體輻射曲線' }
+    { file: './comics/黑體輻射/01_黑體園遊會登場.png', title: '黑體園遊會登場' },
+    { file: './comics/黑體輻射/02_為什麼高頻區的機台比較多.png', title: '為什麼高頻區的機台比較多' },
+    { file: './comics/黑體輻射/03_園遊會的物理翻譯.png', title: '園遊會的物理翻譯' },
+    { file: './comics/黑體輻射/04_古典物理_能量可以無限切分.png', title: '古典物理 能量可以無限切分' },
+    { file: './comics/黑體輻射/05_紫外災難爆發.png', title: '紫外災難爆發' },
+    { file: './comics/黑體輻射/06_小普的新規則_不找零不切割.png', title: '小普的新規則 不找零不切割' },
+    { file: './comics/黑體輻射/07_波茲曼的冷酷現實_越貴越難被啟動.png', title: '波茲曼的冷酷現實 越貴越難被啟動' },
+    { file: './comics/黑體輻射/08_完美的黑體輻射曲線.png', title: '完美的黑體輻射曲線' }
     ],
     Simulation: 黑體輻射Simulation,
   }
