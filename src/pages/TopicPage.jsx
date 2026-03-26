@@ -84,7 +84,7 @@ function Section({ title, children }) {
 
 function NoSim() {
   return (
-    <div className="bg-gray-900 border border-gray-700 rounded-xl p-8 text-center text-gray-500">
+    <div className="bg-gray-900 border border-gray-700 rounded-lg p-8 text-center text-gray-500">
       互動模擬開發中…
     </div>
   )

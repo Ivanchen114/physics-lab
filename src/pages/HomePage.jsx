@@ -5,54 +5,47 @@ export default function HomePage({ onSelectTopic }) {
     <div className="min-h-screen flex flex-col">
 
       {/* ── 頂部學校標識帶 ────────────────────────── */}
-      <div className="bg-gray-950 border-b border-gray-800 px-6 py-2">
-        <div className="max-w-5xl mx-auto flex items-center gap-3">
-          <div className="bg-white rounded-full p-0.5 flex-shrink-0">
-            <img
-              src="./songshan-logo.svg"
-              alt="松山高中校徽"
-              className="h-6 w-auto"
-            />
+      <div className="bg-gray-950/80 backdrop-blur-md border-b border-white/5 px-6 py-2.5 sticky top-0 z-50">
+        <div className="max-w-5xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-3 group">
+            <div className="p-1 rounded-lg transition-colors group-hover:bg-white/5">
+              <img
+                src="./songshan-logo.svg"
+                alt="松山高中校徽"
+                className="h-7 w-auto opacity-90 group-hover:opacity-100 transition-opacity"
+              />
+            </div>
+            <span className="text-gray-400 text-xs font-medium tracking-widest uppercase hidden sm:block">
+              Taipei Municipal Songshan High School
+            </span>
           </div>
-          <span className="text-gray-400 text-sm tracking-wide">
-            臺北市立松山高級中學
-          </span>
+          <div className="text-gray-500 text-[10px] font-bold tracking-tighter uppercase opacity-50">
+            Est. 1958
+          </div>
         </div>
       </div>
 
       {/* ── Hero 標題區 ───────────────────────────── */}
-      <header className="relative overflow-hidden bg-gradient-to-br from-gray-900 via-indigo-950 to-gray-900 py-16 px-6 text-center">
-        {/* 裝飾背景圓 */}
-        <div className="absolute inset-0 opacity-10 pointer-events-none">
-          <div className="absolute top-10 left-1/4 w-64 h-64 bg-purple-500 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-blue-500 rounded-full blur-3xl" />
+      <header className="relative overflow-hidden bg-[#0a0a0f] py-20 px-6 text-center border-b border-white/5">
+        {/* 動態背景與光暈 */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-indigo-600/20 rounded-full blur-[120px]" />
+          <div className="absolute top-40 -left-20 w-80 h-80 bg-purple-600/10 rounded-full blur-[100px]" />
+          <div className="absolute bottom-0 -right-20 w-80 h-80 bg-blue-600/10 rounded-full blur-[100px]" />
         </div>
 
-        <div className="relative z-10 max-w-3xl mx-auto">
-          {/* 學校徽章 */}
-          <div className="inline-flex items-center gap-2.5 bg-white/10 backdrop-blur-sm
-                          border border-white/20 rounded-full px-5 py-2 mb-7">
-            <div className="bg-white rounded-full p-0.5 flex-shrink-0">
-              <img
-                src="./songshan-logo.svg"
-                alt="松山高中校徽"
-                className="h-4 w-auto"
-              />
-            </div>
-            <span className="text-indigo-200 text-sm font-semibold tracking-widest">
-              松山高中
-            </span>
+        <div className="relative z-10 max-w-4xl mx-auto">
+          <div className="flex flex-col items-center gap-2 mb-4">
+             <h1 className="text-5xl md:text-6xl font-black tracking-tight text-white leading-tight">
+               物理漫遊<span className="text-indigo-400">實驗室</span>
+             </h1>
           </div>
-
-          {/* 主標題 */}
-          <p className="text-5xl mb-4">🔬</p>
-          <h1 className="text-4xl md:text-5xl font-black tracking-tight text-white mb-2">
-            物理漫遊實驗室
-          </h1>
-          <p className="text-base text-indigo-300 font-medium mb-1 tracking-widest">
+          
+          <p className="text-lg text-indigo-300/80 font-light tracking-[0.4em] mb-10 uppercase">
             Physics Exploration Lab
           </p>
-          <p className="text-gray-400 mt-4 text-base max-w-xl mx-auto leading-relaxed">
+          
+          <p className="text-gray-300 text-base md:text-lg max-w-2xl mx-auto leading-relaxed font-light">
             用漫畫和互動模擬，讓抽象的物理概念變得直觀好懂。<br />
             選擇一個主題，開始你的物理漫遊！
           </p>
@@ -75,27 +68,63 @@ export default function HomePage({ onSelectTopic }) {
         </div>
       </main>
 
-      {/* ── Footer ──────────────────────────────── */}
+      {/* ── Production Credits Section ───────────────────── */}
+      <section className="bg-gray-900/30 border-t border-gray-800 py-12 px-6">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-widest mb-8 text-center">
+            製作團隊與工作流程 · Production Credits
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <CreditCard 
+              role="艾文 (Ivan)" 
+              tasks="決定主題、審核劇本、串接工具、專案發佈" 
+              icon="👨‍🏫"
+            />
+            <CreditCard 
+              role="Claude (AI)" 
+              tasks="劇本撰寫、互動模擬開發、網站架構整合" 
+              icon="🤖"
+            />
+            <CreditCard 
+              role="GPTs (AI)" 
+              tasks="劇本轉化為 Gemini 分鏡提示詞" 
+              icon="🧠"
+            />
+            <CreditCard 
+              role="Gemini (AI)" 
+              tasks="依分鏡提示詞生成高品質漫畫圖片" 
+              icon="🎨"
+            />
+          </div>
+
+          <div className="mt-10 p-4 bg-indigo-500/5 rounded-lg border border-indigo-500/10 text-center text-xs text-gray-500 leading-relaxed">
+            這是一個 AI 協作實驗：從概念發想到分鏡生成，再到程式開發，我們用 AI 縮短了教學內容的研發路徑。
+          </div>
+        </div>
+      </section>
+
+      {/* ── Final Footer ────────────────────────── */}
       <footer className="border-t border-gray-800 bg-gray-950">
-        <div className="max-w-5xl mx-auto px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          {/* 左：學校資訊 */}
-          <div className="flex items-center gap-3">
-            <div className="bg-white rounded-full p-1 flex-shrink-0">
+        <div className="max-w-5xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-6">
+          <div className="flex items-center gap-4">
+            <div className="bg-white rounded-full p-1.5 flex-shrink-0">
               <img
                 src="./songshan-logo.svg"
                 alt="松山高中校徽"
-                className="h-8 w-auto"
+                className="h-9 w-auto"
               />
             </div>
             <div className="text-left">
-              <p className="text-gray-300 text-sm font-semibold">臺北市立松山高級中學</p>
+              <p className="text-gray-200 text-sm font-bold tracking-wide">臺北市立松山高級中學</p>
               <p className="text-gray-500 text-xs mt-0.5">物理漫遊實驗室 · Physics Exploration Lab</p>
             </div>
           </div>
-          {/* 右：製作資訊 */}
-          <p className="text-gray-600 text-xs text-center sm:text-right leading-relaxed">
-            漫畫由 Gemini 生成<br className="hidden sm:block" /> 模擬由 Claude 開發
-          </p>
+          
+          <div className="text-gray-500 text-xs text-center sm:text-right">
+            <p>© 2026 臺北市立松山高級中學 物理科</p>
+            <p className="mt-1">Powered by Claude, Gemini & GPTs</p>
+          </div>
         </div>
       </footer>
 
@@ -110,56 +139,73 @@ function TopicCard({ topic, onClick }) {
   return (
     <button
       onClick={onClick}
-      className="group text-left bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden
-                 hover:border-indigo-500 hover:shadow-lg hover:shadow-indigo-900/30
-                 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+      className="group text-left bg-gray-900/50 border border-white/5 rounded-xl overflow-hidden
+                 hover:border-indigo-500/50 hover:bg-gray-800/50 hover:shadow-[0_0_30px_rgba(79,70,229,0.15)]
+                 transition-all duration-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
     >
-      {/* 預覽圖（第一張漫畫） */}
-      <div className="relative h-36 overflow-hidden bg-gray-800">
+      {/* 預覽圖 (加上微光遮罩) */}
+      <div className="relative h-44 overflow-hidden bg-gray-950">
         {comics?.[0] && (
           <img
             src={comics[0].file}
             alt={title}
-            className="w-full h-full object-cover object-top
-                       group-hover:scale-105 transition-transform duration-300"
+            className="w-full h-full object-cover object-top opacity-80
+                       group-hover:scale-110 group-hover:opacity-100 transition-all duration-700"
           />
         )}
+        <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-transparent to-transparent opacity-60" />
+        
         {/* emoji 標籤 */}
-        <div className="absolute top-2 left-2 text-2xl">{emoji}</div>
+        <div className="absolute top-3 left-3 text-2xl filter drop-shadow-md group-hover:scale-110 transition-transform">{emoji}</div>
+        
         {/* 標籤 */}
-        <span className={`absolute top-2 right-2 text-xs font-bold px-2 py-0.5 rounded-full text-white ${tagColor}`}>
+        <span className={`absolute top-3 right-3 text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full text-white ${tagColor} shadow-lg shadow-black/20`}>
           {tag}
         </span>
       </div>
 
       {/* 文字內容 */}
-      <div className="p-4">
-        <h3 className="text-lg font-bold text-white mb-0.5 group-hover:text-indigo-300 transition-colors">
+      <div className="p-5">
+        <h3 className="text-xl font-bold text-white mb-1 group-hover:text-indigo-300 transition-colors">
           {title}
         </h3>
-        <p className="text-xs text-gray-400 mb-2">{subtitle}</p>
-        <p className="text-sm text-gray-300 leading-relaxed line-clamp-2">{description}</p>
+        <p className="text-xs text-indigo-400/70 font-medium mb-3 tracking-widest uppercase">{subtitle}</p>
+        <p className="text-sm text-gray-400 leading-relaxed line-clamp-2 font-light">{description}</p>
 
         {/* 漫畫格數標示 */}
-        <div className="mt-3 flex items-center gap-1 text-xs text-gray-500">
-          <span>🖼</span>
-          <span>{comics?.length || 0} 格漫畫</span>
-          <span className="mx-1">·</span>
-          <span>🎮 互動模擬</span>
+        <div className="mt-5 pt-4 border-t border-white/5 flex items-center justify-between text-[10px] text-gray-500 font-bold tracking-widest uppercase">
+          <div className="flex items-center gap-2">
+            <span>🖼 {comics?.length || 0} PANELS</span>
+          </div>
+          <div className="flex items-center gap-1 text-indigo-400/50 group-hover:text-indigo-400 transition-colors">
+            <span>PLAY SIMULATION</span>
+            <span className="text-sm">→</span>
+          </div>
         </div>
       </div>
     </button>
   )
 }
 
+function CreditCard({ role, tasks, icon }) {
+  return (
+    <div className="bg-gray-900/40 border border-white/5 rounded-xl p-6 hover:bg-gray-800/60 hover:border-white/10 transition-all duration-300 group">
+      <div className="text-3xl mb-4 group-hover:scale-110 transition-transform origin-left">{icon}</div>
+      <h3 className="text-white font-bold text-sm mb-2">{role}</h3>
+      <p className="text-gray-500 text-xs leading-relaxed font-light">{tasks}</p>
+    </div>
+  )
+}
+
 // ── 即將推出佔位 ────────────────────────────────
 function ComingSoonCard() {
   return (
-    <div className="bg-gray-900/50 border border-dashed border-gray-700 rounded-2xl p-6
-                    flex flex-col items-center justify-center text-center min-h-[200px]">
-      <p className="text-3xl mb-3">✨</p>
-      <p className="text-gray-400 font-medium">更多主題即將推出</p>
-      <p className="text-gray-600 text-sm mt-1">光電效應、都卜勒效應…</p>
+    <div className="bg-gray-950/30 border border-dashed border-white/10 rounded-xl p-6
+                    flex flex-col items-center justify-center text-center min-h-[250px]
+                    hover:border-white/20 transition-colors">
+      <p className="text-3xl mb-4 opacity-50">✨</p>
+      <p className="text-gray-500 font-medium tracking-widest uppercase text-xs">More Topics Coming Soon</p>
+      <p className="text-gray-700 text-[10px] mt-2 tracking-widest">都卜勒效應、狹義相對論…</p>
     </div>
   )
 }

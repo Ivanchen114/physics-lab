@@ -54,7 +54,7 @@ export default function ComicViewer({ comics = [] }) {
       {/* 主圖區 */}
       <div
         ref={viewerRef}
-        className={`relative bg-gray-900 rounded-xl overflow-hidden border border-gray-800 transition-all
+        className={`relative bg-gray-900 rounded-lg overflow-hidden border border-gray-800 transition-all
           ${isFullscreen
             ? 'w-full h-full bg-black flex items-center justify-center'
             : ''

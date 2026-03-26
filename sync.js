@@ -78,25 +78,48 @@ for (const dir of topicDirs) {
 }
 
 // ─── 產生 topicsConfig.js ────────────────────────────────────────────────────
+const configPath = path.join(__dirname, 'src', 'topicsConfig.js')
+let existingConfig = ''
+if (fs.existsSync(configPath)) {
+  existingConfig = fs.readFileSync(configPath, 'utf8')
+}
+
 const importLines = topicsData
   .filter(t => t.simImport)
   .map(t => `import ${t.simImport} from './simulations/${t.simImport}'`)
   .join('\n')
 
 const topicObjects = topicsData.map(({ dir, comicEntries, simImport }) => {
-  const id    = dir.toLowerCase().replace(/\s+/g, '-')
-  const emoji = '📘' // 預設 emoji，可手動改
+  const id = dir.toLowerCase().replace(/\s+/g, '-')
+  
+  // 嘗試從現有設定中抓取 metadata，若無則用預設值
+  let subtitle = '', emoji = '📘', tag = '物理', tagColor = 'bg-indigo-600', description = '點擊查看漫畫與互動模擬。'
+  
+  if (existingConfig) {
+    const sectionRegex = new RegExp(`id:\\s*['"]${id}['"].*?},`, 's')
+    const match = existingConfig.match(sectionRegex)
+    if (match) {
+      const section = match[0]
+      subtitle    = (section.match(/subtitle:\s*['"](.*?)['"]/) || [null, subtitle])[1]
+      emoji       = (section.match(/emoji:\s*['"](.*?)['"]/) || [null, emoji])[1]
+      tag         = (section.match(/tag:\s*['"](.*?)['"]/) || [null, tag])[1]
+      tagColor    = (section.match(/tagColor:\s*['"](.*?)['"]/) || [null, tagColor])[1]
+      description = (section.match(/description:\s*['"](.*?)['"]/) || [null, description])[1]
+    }
+  }
+
   const comics = comicEntries
     .map(c => `    { file: '${c.file}', title: '${c.title}' }`)
     .join(',\n')
+
   return `  {
     id: '${id}',
     title: '${dir}',
-    subtitle: '',
+    subtitle: '${subtitle.replace(/'/g, "\\'")}',
     emoji: '${emoji}',
-    tag: '物理',
-    tagColor: 'bg-indigo-600',
-    description: '點擊查看漫畫與互動模擬。',
+    tag: '${tag}',
+    tagColor: '${tagColor}',
+    description: '${description.replace(/'/g, "\\'")}',
     comics: [
 ${comics}
     ],
@@ -106,7 +129,8 @@ ${comics}
 
 const config = `// =============================================
 // topicsConfig.js — 由 sync.js 自動產生
-// 如需自訂 emoji、說明文字，請直接在此編輯
+// 如需修改說明文字、emoji，請直接在 topicsConfig.js 編輯
+// 下次執行 sync.js 會自動保留這些欄位
 // =============================================
 
 ${importLines}
@@ -118,6 +142,6 @@ ${topicObjects}
 export default topics
 `
 
-fs.writeFileSync(path.join(__dirname, 'src', 'topicsConfig.js'), config, 'utf8')
+fs.writeFileSync(configPath, config, 'utf8')
 console.log('\n✅ topicsConfig.js 已更新！')
 console.log('👉 接著執行 npm run build 產生網站\n')

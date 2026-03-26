@@ -1,6 +1,7 @@
 // =============================================
 // topicsConfig.js — 由 sync.js 自動產生
-// 如需自訂 emoji、說明文字，請直接在此編輯
+// 如需修改說明文字、emoji，請直接在 topicsConfig.js 編輯
+// 下次執行 sync.js 會自動保留這些欄位
 // =============================================
 
 import 光電效應Simulation from './simulations/光電效應Simulation'
@@ -10,11 +11,11 @@ const topics = [
   {
     id: '光電效應',
     title: '光電效應',
-    subtitle: '',
-    emoji: '📘',
-    tag: '物理',
-    tagColor: 'bg-indigo-600',
-    description: '點擊查看漫畫與互動模擬。',
+    subtitle: '愛因斯坦的光子革命',
+    emoji: '⚡',
+    tag: '量子物理',
+    tagColor: 'bg-yellow-500',
+    description: '用金屬夜店的類比，親眼見證波動說的失敗與光子說的誕生，理解為什麼光是一顆一顆的。',
     comics: [
     { file: './comics/光電效應/1_金屬夜店門口.png', title: '金屬夜店門口' },
     { file: './comics/光電效應/2_波動說的預測.png', title: '波動說的預測' },
@@ -31,11 +32,11 @@ const topics = [
   {
     id: '黑體輻射',
     title: '黑體輻射',
-    subtitle: '',
-    emoji: '📘',
-    tag: '物理',
-    tagColor: 'bg-indigo-600',
-    description: '點擊查看漫畫與互動模擬。',
+    subtitle: '破解紫外災難的百年謎團',
+    emoji: '🌡️',
+    tag: '量子物理',
+    tagColor: 'bg-purple-600',
+    description: '用園遊會扭蛋機類比，理解普朗克如何用「能量量子化」解決紫外災難，推開量子力學的大門。',
     comics: [
     { file: './comics/黑體輻射/1_黑體園遊會登場.png', title: '黑體園遊會登場' },
     { file: './comics/黑體輻射/2_為什麼高頻區的機台比較多？.png', title: '為什麼高頻區的機台比較多？' },
