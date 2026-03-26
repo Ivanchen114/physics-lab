@@ -426,8 +426,10 @@ export default function 物質波Simulation() {
 
       {/* 量子粒子在波動樣態下的提示 */}
       {viewMode === 'wave' && pt.isQuantum && (
-        <div className="rounded-lg px-3 py-2 bg-cyan-950/30 border border-cyan-800/40 text-xs text-cyan-300/80">
-          🌊 過縫前：波包向前傳播　　過縫後：從兩條縫各自展開弧形波前，兩波相疊產生干涉
+        <div className="rounded-lg px-3 py-2 bg-cyan-950/30 border border-cyan-800/40 text-xs text-cyan-300/80 leading-relaxed">
+          {mode === 'story'
+            ? '🌊 過縫前：波包向前傳播　過縫後：從兩條縫各自展開弧形波前，兩波相疊產生干涉'
+            : '📐 此為惠更斯原理的古典波動類比。電子的「波」實為機率振幅波函數 ψ，非實體振動——但兩者的干涉數學完全相同，結果都是 cos² 分佈。'}
         </div>
       )}
 
