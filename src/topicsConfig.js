@@ -6,7 +6,6 @@
 
 import 光電效應Simulation from './simulations/光電效應Simulation'
 import 黑體輻射Simulation from './simulations/黑體輻射Simulation'
-import 物質波Simulation from './simulations/物質波Simulation'
 
 const topics = [
   {
@@ -34,6 +33,26 @@ const topics = [
   },
 
   {
+    id: '物質波',
+    title: '物質波',
+    subtitle: '德布羅意的革命：粒子也是波',
+    emoji: '🌊',
+    tag: '量子物理',
+    tagColor: 'bg-cyan-600',
+    description: '電子為什麼有干涉條紋？棒球為什麼沒有？用雙縫實驗親眼看懂量子世界的機率本質。',
+    comics: [
+    { file: './comics/物質波/1.png', title: '1' },
+    { file: './comics/物質波/2.png', title: '2' },
+    { file: './comics/物質波/3.png', title: '3' },
+    { file: './comics/物質波/4.png', title: '4' },
+    { file: './comics/物質波/5.png', title: '5' },
+    { file: './comics/物質波/6.png', title: '6' },
+    { file: './comics/物質波/7.png', title: '7' }
+    ],
+    Simulation: null,
+  },
+
+  {
     id: '黑體輻射',
     title: '黑體輻射',
     subtitle: '破解紫外災難的百年謎團',
@@ -52,26 +71,6 @@ const topics = [
     { file: './comics/黑體輻射/08_完美的黑體輻射曲線.png', title: '完美的黑體輻射曲線' }
     ],
     Simulation: 黑體輻射Simulation,
-  },
-
-  {
-    id: '物質波',
-    title: '物質波',
-    subtitle: '德布羅意的革命：粒子也是波',
-    emoji: '🌊',
-    tag: '量子物理',
-    tagColor: 'bg-cyan-600',
-    description: '電子為什麼有干涉條紋？棒球為什麼沒有？用雙縫實驗親眼看懂量子世界的機率本質。',
-    comics: [
-    { file: './comics/物質波/01_每個人都有波長：德布羅意的大膽猜想.png', title: '每個人都有波長：德布羅意的大膽猜想' },
-    { file: './comics/物質波/02_電子為什麼看不到波：波長太短，無法察覺.png', title: '電子為什麼看不到波：波長太短，無法察覺' },
-    { file: './comics/物質波/03_棒球的波長：比原子核還小的荒謬數字.png', title: '棒球的波長：比原子核還小的荒謬數字' },
-    { file: './comics/物質波/04_雙縫實驗：電子真的同時通過兩條縫.png', title: '雙縫實驗：電子真的同時通過兩條縫' },
-    { file: './comics/物質波/05_一顆一顆射：隨機的落點，規律的條紋.png', title: '一顆一顆射：隨機的落點，規律的條紋' },
-    { file: './comics/物質波/06_偷看就消失：觀測本身改變了結果.png', title: '偷看就消失：觀測本身改變了結果' },
-    { file: './comics/物質波/07_物質波的本質：機率波，不是真實的振動.png', title: '物質波的本質：機率波，不是真實的振動' },
-    ],
-    Simulation: 物質波Simulation,
   }
 ]
 
