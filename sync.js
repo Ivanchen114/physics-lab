@@ -31,6 +31,13 @@ const topicDirs = fs.readdirSync(ROOT).filter(name => {
 
 console.log(`\n🔍 找到 ${topicDirs.length} 個主題資料夾：${topicDirs.join(', ')}\n`)
 
+// 先讀現有 config，以便後續保留 title / metadata
+const configPath = path.join(__dirname, 'src', 'topicsConfig.js')
+let existingConfig = ''
+if (fs.existsSync(configPath)) {
+  existingConfig = fs.readFileSync(configPath, 'utf8')
+}
+
 const topicsData = []
 
 for (const dir of topicDirs) {
@@ -53,17 +60,32 @@ for (const dir of topicDirs) {
   // ── 複製 PNG 到 public/comics/[dir]/ ──
   const comicsDir = path.join(COMICS_OUT, dir)
   fs.mkdirSync(comicsDir, { recursive: true })
+
+  // 從現有 config 取出這個主題的 comics 陣列（用於保留已手動設定的 title）
+  const existingComicMap = {}
+  if (existingConfig) {
+    const comicLineRe = /file:\s*['"]([^'"]+)['"]\s*,\s*title:\s*['"]([^'"]+)['"]/g
+    let m
+    while ((m = comicLineRe.exec(existingConfig)) !== null) {
+      existingComicMap[m[1]] = m[2]
+    }
+  }
+
   const comicEntries = []
   for (const png of pngs) {
     fs.copyFileSync(path.join(topicPath, png), path.join(comicsDir, png))
-    const title = png.replace(/^\d+_/, '').replace(/\.png$/i, '').replace(/_/g, ' ')
-    comicEntries.push({ file: `./comics/${dir}/${png}`, title })
+    const filePath = `./comics/${dir}/${png}`
+    // 優先使用已存在的 title，否則從檔名推導
+    const defaultTitle = png.replace(/^\d+[-_]/, '').replace(/\.png$/i, '').replace(/_/g, ' ')
+    const title = existingComicMap[filePath] || defaultTitle
+    comicEntries.push({ file: filePath, title })
   }
   console.log(`  🖼  ${dir}：複製 ${pngs.length} 張漫畫`)
 
   // ── 複製 JSX 到 src/simulations/ ──
   let simImport = null
   const simName = dir.replace(/\s+/g, '') + 'Simulation'
+  // 優先從主題資料夾找 JSX
   for (const f of jsxFiles) {
     if (f.toLowerCase().endsWith('.jsx')) {
       const dest = path.join(SIMS_OUT, simName + '.jsx')
@@ -73,16 +95,20 @@ for (const dir of topicDirs) {
       break
     }
   }
+  // Fallback：如果主題資料夾沒有 JSX，看 src/simulations/ 是否已有對應檔案
+  if (!simImport) {
+    const existingSim = path.join(SIMS_OUT, simName + '.jsx')
+    if (fs.existsSync(existingSim)) {
+      simImport = simName
+      console.log(`  🎮  ${dir}：沿用既有模擬 ${simName}.jsx`)
+    }
+  }
 
   topicsData.push({ dir, comicEntries, simImport })
 }
 
 // ─── 產生 topicsConfig.js ────────────────────────────────────────────────────
-const configPath = path.join(__dirname, 'src', 'topicsConfig.js')
-let existingConfig = ''
-if (fs.existsSync(configPath)) {
-  existingConfig = fs.readFileSync(configPath, 'utf8')
-}
+// configPath / existingConfig 已在上方宣告
 
 const importLines = topicsData
   .filter(t => t.simImport)
