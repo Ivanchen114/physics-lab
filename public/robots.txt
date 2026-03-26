@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://physics-lab-sssh.vercel.app/sitemap.xml
