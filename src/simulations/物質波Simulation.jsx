@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 
 // ============================================================
-// 畫布常數（固定，不依賴狀態）
+// 畫布常數
 // ============================================================
 const CW = 680
 const CH = 340
@@ -9,8 +9,8 @@ const SRC_X = 48
 const BAR_X = Math.round(CW * 0.50)
 const SCR_X = Math.round(CW * 0.87)
 const CANVAS_CY = CH / 2
-const SLIT_W = 10   // 單條縫寬度（px）
-const L_DIST = SCR_X - BAR_X  // 隔板到螢幕距離
+const SLIT_W = 10
+const L_DIST = SCR_X - BAR_X
 
 // ============================================================
 // 粒子類型設定
@@ -19,7 +19,7 @@ const PARTICLE_TYPES = {
   electron: {
     label: '電子',   tag: '量子粒子',
     λReal: '0.73 nm',
-    λSim: 36,         // 模擬用縮放波長（px），量子才有效
+    λSim: 36,
     isQuantum: true,
     color: '#60a5fa',
     dotColor: 'rgba(96, 165, 250, 0.8)',
@@ -67,8 +67,7 @@ const PARTICLE_TYPES = {
 }
 
 // ============================================================
-// 量子干涉分佈取樣（拒絕取樣 rejection sampling）
-// cos²(πdΔy / λL) 對應雙縫干涉強度
+// 物理取樣函式
 // ============================================================
 function sampleQuantumY(d, λSim) {
   const halfRange = CH * 0.44
@@ -80,7 +79,6 @@ function sampleQuantumY(d, λSim) {
   return CANVAS_CY
 }
 
-// 古典：從其中一條縫出發 + 小 Gaussian 散佈
 function sampleClassicalY(d) {
   const sign = Math.random() < 0.5 ? 1 : -1
   const slitCY = CANVAS_CY + sign * d / 2
@@ -90,23 +88,86 @@ function sampleClassicalY(d) {
 }
 
 // ============================================================
+// 繪製輔助：波包（量子粒子，過縫前，或古典粒子）
+// ============================================================
+function drawWavePacket(ctx, px, py, cfg, now) {
+  const λ = Math.max(cfg.λSim, 12)  // 視覺波長
+  const ww = 30                      // 波包半寬（px）
+  const amp = cfg.size * 2.2
+  const phase = now * 0.006          // 動態相位（讓波包看起來在振動）
+
+  // 外發光
+  ctx.save()
+  ctx.shadowColor = cfg.color
+  ctx.shadowBlur = 6
+
+  ctx.beginPath()
+  for (let i = 0; i <= 100; i++) {
+    const dx = (i / 100) * 2 * ww - ww
+    const envelope = Math.exp(-(dx * dx) / (ww * ww * 0.45))
+    const dy = Math.sin((2 * Math.PI * dx / λ) - phase) * amp * envelope
+    i === 0 ? ctx.moveTo(px + dx, py + dy) : ctx.lineTo(px + dx, py + dy)
+  }
+  ctx.strokeStyle = cfg.color
+  ctx.lineWidth = 2
+  ctx.stroke()
+  ctx.restore()
+
+  // 中心小點（強調「還是一個實體」）
+  ctx.beginPath()
+  ctx.arc(px, py, cfg.size * 0.6, 0, Math.PI * 2)
+  ctx.fillStyle = cfg.color
+  ctx.fill()
+}
+
+// ============================================================
+// 繪製輔助：過縫後的雙弧波前（量子，波動樣態）
+// ============================================================
+function drawWavefronts(ctx, p, slitSep) {
+  const r = p.x - BAR_X
+  if (r < 3) return
+
+  const s1y = CANVAS_CY - slitSep / 2
+  const s2y = CANVAS_CY + slitSep / 2
+  const fade = Math.max(0.08, 0.55 - (r / L_DIST) * 0.45)
+
+  ctx.save()
+  ctx.globalAlpha = fade
+  ctx.strokeStyle = p.cfg.color
+  ctx.lineWidth = 1.5
+
+  for (const sy of [s1y, s2y]) {
+    ctx.beginPath()
+    // 半弧（只畫面向螢幕方向）
+    ctx.arc(BAR_X, sy, r, -Math.PI * 0.62, Math.PI * 0.62)
+    ctx.stroke()
+  }
+  ctx.restore()
+}
+
+// ============================================================
 // 主元件
 // ============================================================
 export default function 物質波Simulation() {
-  const [ptKey, setPtKey] = useState('electron')
-  const [slitSep, setSlitSep] = useState(60)
+  const [ptKey, setPtKey]       = useState('electron')
+  const [slitSep, setSlitSep]   = useState(60)
   const [fireRate, setFireRate] = useState(8)
-  const [mode, setMode] = useState('story')
+  const [mode, setMode]         = useState('story')    // 故事 / 物理 說明文字
+  const [viewMode, setViewMode] = useState('particle') // ← 新增：粒子 / 波動 樣態
   const [dotCount, setDotCount] = useState(0)
 
-  const canvasRef = useRef(null)
-  const patternCanvasRef = useRef(null)  // 離屏畫布：累積落點
-  const stRef = useRef({ particles: [], lastFire: 0 })
-  const animRef = useRef(null)
+  const canvasRef      = useRef(null)
+  const patternCanvasRef = useRef(null)
+  const stRef          = useRef({ particles: [], lastFire: 0 })
+  const animRef        = useRef(null)
+
+  // viewMode 用 ref 傳入 animation loop，避免重啟動畫
+  const viewModeRef = useRef(viewMode)
+  useEffect(() => { viewModeRef.current = viewMode }, [viewMode])
 
   const pt = PARTICLE_TYPES[ptKey]
 
-  // ---- 初始化離屏畫布 ----
+  // 初始化離屏畫布
   useEffect(() => {
     const pc = document.createElement('canvas')
     pc.width = CW
@@ -114,7 +175,7 @@ export default function 物質波Simulation() {
     patternCanvasRef.current = pc
   }, [])
 
-  // ---- 重置 ----
+  // 重置
   const doReset = useCallback(() => {
     stRef.current.particles = []
     stRef.current.lastFire = 0
@@ -133,7 +194,6 @@ export default function 物質波Simulation() {
     let prevTime = performance.now()
     let running = true
 
-    // 生成新粒子
     function spawnParticle() {
       const cfg = PARTICLE_TYPES[ptKey]
       let targetY
@@ -159,12 +219,13 @@ export default function 物質波Simulation() {
     function frame(now) {
       const dt = Math.min((now - prevTime) / 1000, 0.05)
       prevTime = now
+      const vm = viewModeRef.current  // 讀當前 viewMode
 
       // ── 背景 ──
       ctx.fillStyle = '#080f1e'
       ctx.fillRect(0, 0, CW, CH)
 
-      // ── 中心線（輔助） ──
+      // ── 中心輔助線 ──
       ctx.strokeStyle = 'rgba(255,255,255,0.03)'
       ctx.lineWidth = 1
       ctx.setLineDash([4, 8])
@@ -181,7 +242,6 @@ export default function 物質波Simulation() {
       ctx.fill()
       ctx.fillStyle = '#3b82f6'
       ctx.fillRect(SRC_X - 16, CANVAS_CY - 5, 16, 10)
-      // 閃光指示
       if (Math.floor(now / 180) % 2 === 0) {
         ctx.beginPath()
         ctx.arc(SRC_X, CANVAS_CY, 5, 0, Math.PI * 2)
@@ -198,18 +258,17 @@ export default function 物質波Simulation() {
       ctx.fillRect(BAR_X - 5, 0, 10, s1t)
       ctx.fillRect(BAR_X - 5, s1b, 10, s2t - s1b)
       ctx.fillRect(BAR_X - 5, s2b, 10, CH - s2b)
-      // 縫的邊緣高光
       ctx.fillStyle = 'rgba(148,163,184,0.12)'
       ctx.fillRect(BAR_X - 5, s1t, 10, SLIT_W)
       ctx.fillRect(BAR_X - 5, s2t, 10, SLIT_W)
 
-      // ── 偵測螢幕區域背景 ──
+      // ── 偵測螢幕 ──
       ctx.fillStyle = '#0d1b2e'
       ctx.fillRect(SCR_X, 0, CW - SCR_X, CH)
       ctx.fillStyle = '#2d4263'
       ctx.fillRect(SCR_X, 0, 3, CH)
 
-      // ── 繪製累積落點（離屏畫布 → 主畫布） ──
+      // ── 累積落點 ──
       const pc = patternCanvasRef.current
       if (pc) ctx.drawImage(pc, 0, 0)
 
@@ -218,16 +277,14 @@ export default function 物質波Simulation() {
       for (const p of stRef.current.particles) {
         p.x += p.speed * dt
 
-        // 更新 y 位置
+        // 更新 y
         if (p.x < BAR_X) {
           p.y = CANVAS_CY
         } else {
           const prog = Math.min((p.x - BAR_X) / L_DIST, 1)
           if (p.cfg.isQuantum) {
-            // 量子：直接從中心插值到目標（視覺化波函數坍縮過程）
             p.y = CANVAS_CY + (p.targetY - CANVAS_CY) * prog
           } else {
-            // 古典：先轉向對應的縫，再到目標
             if (prog < 0.18) {
               p.y = CANVAS_CY + (p.slitY - CANVAS_CY) * (prog / 0.18)
             } else {
@@ -238,7 +295,7 @@ export default function 物質波Simulation() {
         }
 
         if (p.x >= SCR_X) {
-          // 到達螢幕，畫點到離屏畫布
+          // 到達螢幕，寫入累積圖
           const pctx = pc?.getContext('2d')
           if (pctx) {
             pctx.beginPath()
@@ -248,27 +305,36 @@ export default function 物質波Simulation() {
           }
           setDotCount(c => c + 1)
         } else {
-          // 畫飛行中的粒子
-          if (p.cfg.isQuantum && p.x > BAR_X) {
-            // 量子粒子：光暈（象徵波函數擴散）
-            const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.cfg.size + 10)
-            grad.addColorStop(0, p.cfg.color)
-            grad.addColorStop(0.35, p.cfg.glowColor)
-            grad.addColorStop(1, 'rgba(0,0,0,0)')
+          // ── 依 viewMode 決定畫法 ──
+          if (vm === 'wave' && p.cfg.isQuantum) {
+            if (p.x < BAR_X) {
+              // 過縫前：畫波包
+              drawWavePacket(ctx, p.x, CANVAS_CY, p.cfg, now)
+            } else {
+              // 過縫後：畫兩道展開弧形波前
+              drawWavefronts(ctx, p, slitSep)
+            }
+          } else {
+            // 粒子樣態（所有粒子）或古典粒子的波動樣態
+            if (p.cfg.isQuantum && p.x > BAR_X) {
+              const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.cfg.size + 10)
+              grad.addColorStop(0, p.cfg.color)
+              grad.addColorStop(0.35, p.cfg.glowColor)
+              grad.addColorStop(1, 'rgba(0,0,0,0)')
+              ctx.beginPath()
+              ctx.arc(p.x, p.y, p.cfg.size + 10, 0, Math.PI * 2)
+              ctx.fillStyle = grad
+              ctx.fill()
+            }
             ctx.beginPath()
-            ctx.arc(p.x, p.y, p.cfg.size + 10, 0, Math.PI * 2)
-            ctx.fillStyle = grad
+            ctx.arc(p.x, p.y, p.cfg.size, 0, Math.PI * 2)
+            ctx.fillStyle = p.cfg.color
             ctx.fill()
-          }
-          // 實心核心
-          ctx.beginPath()
-          ctx.arc(p.x, p.y, p.cfg.size, 0, Math.PI * 2)
-          ctx.fillStyle = p.cfg.color
-          ctx.fill()
-          if (!p.cfg.isQuantum) {
-            ctx.strokeStyle = 'rgba(255,255,255,0.3)'
-            ctx.lineWidth = 1.2
-            ctx.stroke()
+            if (!p.cfg.isQuantum) {
+              ctx.strokeStyle = 'rgba(255,255,255,0.3)'
+              ctx.lineWidth = 1.2
+              ctx.stroke()
+            }
           }
           survive.push(p)
         }
@@ -301,21 +367,20 @@ export default function 物質波Simulation() {
     }
   }, [ptKey, slitSep, fireRate])
 
+  // ============================================================
+  // Render
+  // ============================================================
   return (
     <div className="bg-gray-900 rounded-xl p-4 space-y-3">
 
-      {/* 模式切換 + 計數 */}
+      {/* ── 頂列：說明模式 + 計數 ── */}
       <div className="flex items-center justify-between">
         <div className="flex gap-1 bg-gray-800 rounded-lg p-1">
-          {[['story', '📖 故事模式'], ['physics', '🔬 物理模式']].map(([m, label]) => (
-            <button key={m}
-              onClick={() => setMode(m)}
+          {[['story', '📖 故事'], ['physics', '🔬 物理']].map(([m, label]) => (
+            <button key={m} onClick={() => setMode(m)}
               className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors ${
                 mode === m ? 'bg-indigo-600 text-white' : 'text-gray-400 hover:text-gray-200'
-              }`}
-            >
-              {label}
-            </button>
+              }`}>{label}</button>
           ))}
         </div>
         <span className="text-xs text-gray-500">
@@ -323,11 +388,53 @@ export default function 物質波Simulation() {
         </span>
       </div>
 
+      {/* ── 波粒樣態切換（主角按鈕）── */}
+      <div className="flex gap-2 items-stretch">
+        <button
+          onClick={() => setViewMode('particle')}
+          className={`flex-1 py-2.5 rounded-xl border-2 text-sm font-bold transition-all flex flex-col items-center gap-0.5 ${
+            viewMode === 'particle'
+              ? 'border-indigo-400 bg-indigo-950/70 text-white shadow-lg shadow-indigo-900/40'
+              : 'border-gray-700 text-gray-500 hover:border-gray-500 hover:text-gray-300'
+          }`}
+        >
+          <span className="text-xl">●</span>
+          <span>粒子樣態</span>
+          <span className="text-xs font-normal opacity-60">看到一顆顆飛</span>
+        </button>
+        <div className="flex items-center text-gray-600 text-lg font-light">⇄</div>
+        <button
+          onClick={() => setViewMode('wave')}
+          className={`flex-1 py-2.5 rounded-xl border-2 text-sm font-bold transition-all flex flex-col items-center gap-0.5 ${
+            viewMode === 'wave'
+              ? 'border-cyan-400 bg-cyan-950/60 text-white shadow-lg shadow-cyan-900/40'
+              : 'border-gray-700 text-gray-500 hover:border-gray-500 hover:text-gray-300'
+          }`}
+        >
+          <span className="text-xl">〜</span>
+          <span>波動樣態</span>
+          <span className="text-xs font-normal opacity-60">看到波包展開</span>
+        </button>
+      </div>
+
+      {/* 古典粒子在波動樣態下的提示 */}
+      {viewMode === 'wave' && !pt.isQuantum && (
+        <div className="rounded-lg px-3 py-2 bg-amber-950/30 border border-amber-700/40 text-xs text-amber-300/80">
+          ⚠️ 古典物體的物質波波長極短（{pt.λReal}），縮放後無法以波動方式呈現——仍顯示為粒子。
+        </div>
+      )}
+
+      {/* 量子粒子在波動樣態下的提示 */}
+      {viewMode === 'wave' && pt.isQuantum && (
+        <div className="rounded-lg px-3 py-2 bg-cyan-950/30 border border-cyan-800/40 text-xs text-cyan-300/80">
+          🌊 過縫前：波包向前傳播　　過縫後：從兩條縫各自展開弧形波前，兩波相疊產生干涉
+        </div>
+      )}
+
       {/* 粒子選擇器 */}
       <div className="grid grid-cols-4 gap-2">
         {Object.entries(PARTICLE_TYPES).map(([key, cfg]) => (
-          <button key={key}
-            onClick={() => setPtKey(key)}
+          <button key={key} onClick={() => setPtKey(key)}
             className={`p-2 rounded-lg border text-center transition-all ${
               ptKey === key
                 ? 'border-indigo-500 bg-indigo-950/60'
@@ -335,25 +442,20 @@ export default function 物質波Simulation() {
             }`}
           >
             <div className="text-xs font-bold" style={{ color: cfg.color }}>{cfg.label}</div>
-            <div className={`text-xs mt-0.5 ${cfg.isQuantum ? 'text-blue-400' : 'text-amber-400'}`}>
-              {cfg.tag}
-            </div>
+            <div className={`text-xs mt-0.5 ${cfg.isQuantum ? 'text-blue-400' : 'text-amber-400'}`}>{cfg.tag}</div>
           </button>
         ))}
       </div>
 
-      {/* 德布羅意波長資訊面板 */}
+      {/* 德布羅意波長資訊 */}
       <div className={`rounded-lg p-3 border ${
-        pt.isQuantum
-          ? 'border-blue-800/60 bg-blue-950/25'
-          : 'border-amber-700/50 bg-amber-950/20'
+        pt.isQuantum ? 'border-blue-800/60 bg-blue-950/25' : 'border-amber-700/50 bg-amber-950/20'
       }`}>
         <div className="flex items-start gap-2.5">
           <span className="text-xl mt-0.5">{pt.isQuantum ? '🌊' : '🎱'}</span>
           <div className="flex-1 min-w-0">
             <div className="text-sm font-bold text-white">
-              德布羅意波長 λ ={' '}
-              <span style={{ color: pt.color }}>{pt.λReal}</span>
+              德布羅意波長 λ = <span style={{ color: pt.color }}>{pt.λReal}</span>
             </div>
             <div className="text-xs text-gray-400 mt-1 leading-relaxed">
               {mode === 'story' ? pt.storyNote : pt.physNote}
@@ -363,12 +465,8 @@ export default function 物質波Simulation() {
       </div>
 
       {/* 主畫布 */}
-      <canvas
-        ref={canvasRef}
-        width={CW}
-        height={CH}
-        className="w-full rounded-lg border border-gray-700 block"
-      />
+      <canvas ref={canvasRef} width={CW} height={CH}
+        className="w-full rounded-lg border border-gray-700 block" />
 
       {/* 控制滑桿 */}
       <div className="grid grid-cols-2 gap-4">
@@ -379,8 +477,7 @@ export default function 物質波Simulation() {
           </div>
           <input type="range" min="30" max="110" step="5" value={slitSep}
             onChange={e => setSlitSep(Number(e.target.value))}
-            className="w-full accent-indigo-500"
-          />
+            className="w-full accent-indigo-500" />
         </label>
         <label className="space-y-1.5">
           <div className="text-xs text-gray-400">
@@ -388,16 +485,13 @@ export default function 物質波Simulation() {
           </div>
           <input type="range" min="1" max="20" value={fireRate}
             onChange={e => setFireRate(Number(e.target.value))}
-            className="w-full accent-indigo-500"
-          />
+            className="w-full accent-indigo-500" />
         </label>
       </div>
 
-      {/* 重置按鈕 */}
-      <button
-        onClick={doReset}
-        className="w-full py-2 text-sm bg-gray-700 hover:bg-gray-600 rounded-lg text-gray-300 transition-colors font-medium"
-      >
+      {/* 重置 */}
+      <button onClick={doReset}
+        className="w-full py-2 text-sm bg-gray-700 hover:bg-gray-600 rounded-lg text-gray-300 transition-colors font-medium">
         🔄 清除螢幕，重新累積
       </button>
 
@@ -405,8 +499,8 @@ export default function 物質波Simulation() {
       {dotCount >= 80 && (
         <p className="text-xs text-center text-gray-500 leading-relaxed">
           {pt.isQuantum
-            ? `✨ 看到條紋了嗎？每顆粒子落點隨機，但累積後規律浮現——這就是量子機率的本質`
-            : `🎯 兩條清晰的帶，分別對應兩道縫。沒有干涉，只有彈道——古典世界的樣子`}
+            ? '✨ 看到條紋了嗎？每顆粒子落點隨機，但累積後規律浮現——這就是量子機率的本質'
+            : '🎯 兩條清晰的帶，分別對應兩道縫。沒有干涉，只有彈道——古典世界的樣子'}
         </p>
       )}
 
