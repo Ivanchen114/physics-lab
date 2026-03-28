@@ -23,11 +23,24 @@ export default function TopicPage({ topic, onBack }) {
       </nav>
 
       {/* 主題說明 */}
-      <div className="bg-gradient-to-r from-gray-900 to-indigo-950/40 px-5 py-5 border-b border-gray-800">
-        <div className="max-w-5xl mx-auto">
-          <h1 className="text-2xl font-black text-white mb-0.5">{title}</h1>
-          <p className="text-indigo-300 text-sm mb-2">{subtitle}</p>
-          <p className="text-gray-400 text-sm leading-relaxed max-w-2xl">{description}</p>
+      <div className="relative border-b border-gray-800 bg-gray-900">
+        {topic.cover ? (
+          <div className="absolute inset-0 z-0 overflow-hidden">
+            <img 
+              src={topic.cover} 
+              alt={title} 
+              className="w-full h-full object-cover opacity-35 mix-blend-screen" 
+              style={{ WebkitMaskImage: 'linear-gradient(to bottom, black 50%, transparent 100%)', maskImage: 'linear-gradient(to bottom, black 50%, transparent 100%)' }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-900/40 to-transparent" />
+          </div>
+        ) : (
+          <div className="absolute inset-0 z-0 bg-gradient-to-r from-gray-900 to-indigo-950/40" />
+        )}
+        <div className="relative z-10 max-w-5xl mx-auto px-5 py-8 md:py-12">
+          <h1 className="text-3xl font-black text-white mb-2 tracking-tight drop-shadow-md">{title}</h1>
+          <p className="text-indigo-300 text-base mb-3 font-medium drop-shadow">{subtitle}</p>
+          <p className="text-gray-300 text-sm leading-relaxed max-w-2xl drop-shadow">{description}</p>
         </div>
       </div>
 

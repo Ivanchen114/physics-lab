@@ -61,6 +61,18 @@ for (const dir of topicDirs) {
   const comicsDir = path.join(COMICS_OUT, dir)
   fs.mkdirSync(comicsDir, { recursive: true })
 
+  // ── 複製 cover.png (如果有) ──
+  const coverSrc = path.join(topicPath, 'cover.png')
+  let coverRelPath = 'null'
+  if (fs.existsSync(coverSrc)) {
+    const coversDir = path.join(__dirname, 'public', 'covers')
+    if (!fs.existsSync(coversDir)) fs.mkdirSync(coversDir, { recursive: true })
+    const coverDest = path.join(coversDir, dir + '.png')
+    fs.copyFileSync(coverSrc, coverDest)
+    coverRelPath = `'/covers/${encodeURIComponent(dir)}.png'`
+    console.log(`  🖼  ${dir}：複製封面圖`)
+  }
+
   // 從現有 config 取出這個主題的 comics 陣列（用於保留已手動設定的 title）
   const existingComicMap = {}
   if (existingConfig) {
@@ -134,6 +146,11 @@ const topicObjects = topicsData.map(({ dir, comicEntries, simImport }) => {
       tag         = (section.match(/tag:\s*['"](.*?)['"]/) || [null, tag])[1]
       tagColor    = (section.match(/tagColor:\s*['"](.*?)['"]/) || [null, tagColor])[1]
       description = (section.match(/description:\s*['"](.*?)['"]/) || [null, description])[1]
+      
+      const coverMatch = section.match(/cover:\s*(null|['"][^'"]*['"])/)
+      if (coverMatch && coverRelPath === 'null') {
+        coverRelPath = coverMatch[1]
+      }
     }
   }
 
@@ -149,6 +166,7 @@ const topicObjects = topicsData.map(({ dir, comicEntries, simImport }) => {
     tag: '${tag}',
     tagColor: '${tagColor}',
     description: '${description.replace(/'/g, "\\'")}',
+    cover: ${coverRelPath},
     comics: [
 ${comics}
     ],
