@@ -1,37 +1,23 @@
-/**
- * sync.js — 物理漫遊實驗室自動同步腳本
- *
- * 使用方式：在 website/ 目錄下執行
- *   node sync.js
- *
- * 功能：
- *   1. 掃描上層的主題資料夾（每個子資料夾 = 一個主題）
- *   2. 複製 PNG 漫畫圖片到 public/comics/
- *   3. 複製 JSX 模擬程式碼到 src/simulations/
- *   4. 更新 src/topicsConfig.js
- */
-
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
-const ROOT       = path.join(__dirname, '..')          // 物理漫遊實驗室/
+const ROOT       = path.join(__dirname, '..')
 const COMICS_OUT = path.join(__dirname, 'public', 'comics')
 const SIMS_OUT   = path.join(__dirname, 'src', 'simulations')
 
-// 不掃描這個資料夾本身
-const SKIP_DIRS = ['website', '.git', '.skills', '.auto-memory', '.remote-plugins', 'node_modules']
+// Using hardcoded topics list because root readdirSync fails with EPERM
+const topicDirs = [
+  '01_黑體輻射',
+  '02_光電效應',
+  '03_物質波',
+  '04_原子線譜與量子態',
+  '05_不確定性原理'
+]
 
-// ─── 主程式 ──────────────────────────────────────────────────────────────────
-const topicDirs = fs.readdirSync(ROOT).filter(name => {
-  const full = path.join(ROOT, name)
-  return fs.statSync(full).isDirectory() && !SKIP_DIRS.includes(name)
-})
+console.log(`\n🔍 手動指定同步主題：${topicDirs.join(', ')}\n`)
 
-console.log(`\n🔍 找到 ${topicDirs.length} 個主題資料夾：${topicDirs.join(', ')}\n`)
-
-// 先讀現有 config，以便後續保留 title / metadata
 const configPath = path.join(__dirname, 'src', 'topicsConfig.js')
 let existingConfig = ''
 if (fs.existsSync(configPath)) {
@@ -42,26 +28,26 @@ const topicsData = []
 
 for (const dir of topicDirs) {
   const topicPath = path.join(ROOT, dir)
+  if (!fs.existsSync(topicPath)) {
+    console.log(`⚠️  找不到資料夾 ${dir}，跳過`)
+    continue
+  }
   const files = fs.readdirSync(topicPath)
 
-  // ── 找 PNG 圖片，按名稱排序 ──
   const pngs = files
     .filter(f => f.toLowerCase().endsWith('.png'))
     .sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }))
 
-  // ── 找 JSX 模擬檔 ──
-  const jsxFiles = files.filter(f => f.toLowerCase().endsWith('.jsx') || f.toLowerCase().endsWith('.rtf'))
+  const jsxFiles = files.filter(f => f.toLowerCase().endsWith('.jsx'))
 
   if (!pngs.length && !jsxFiles.length) {
     console.log(`⚠️  ${dir}：沒有 PNG 或 JSX，跳過`)
     continue
   }
 
-  // ── 複製 PNG 到 public/comics/[dir]/ ──
   const comicsDir = path.join(COMICS_OUT, dir)
   fs.mkdirSync(comicsDir, { recursive: true })
 
-  // 從現有 config 取出這個主題的 comics 陣列（用於保留已手動設定的 title）
   const existingComicMap = {}
   if (existingConfig) {
     const comicLineRe = /file:\s*['"]([^'"]+)['"]\s*,\s*title:\s*['"]([^'"]+)['"]/g
@@ -75,30 +61,23 @@ for (const dir of topicDirs) {
   for (const png of pngs) {
     fs.copyFileSync(path.join(topicPath, png), path.join(comicsDir, png))
     const filePath = `./comics/${dir}/${png}`
-    // 優先使用已存在的 title，否則從檔名推導
     const defaultTitle = png.replace(/^\d+[-_]/, '').replace(/\.png$/i, '').replace(/_/g, ' ')
     const title = existingComicMap[filePath] || defaultTitle
     comicEntries.push({ file: filePath, title })
   }
   console.log(`  🖼  ${dir}：複製 ${pngs.length} 張漫畫`)
 
-  // ── 複製 JSX 到 src/simulations/ ──
   let simImport = null
-  // 檔案名稱保留完整資料夾名（例如 01_黑體輻射Simulation.jsx）
   const simFileName = dir.replace(/\s+/g, '') + 'Simulation'
-  // JS 識別符不能以數字開頭，移除前綴數字和底線（例如 "01_" → ""）
-  const simVarName = simFileName.replace(/^\d+_?/, '') + (simFileName.match(/^\d+_?/) ? '' : '')
-  // 優先從主題資料夾找 JSX
+  const simVarName = simFileName.replace(/^\d+_?/, '')
   for (const f of jsxFiles) {
-    if (f.toLowerCase().endsWith('.jsx')) {
-      const dest = path.join(SIMS_OUT, simFileName + '.jsx')
-      fs.copyFileSync(path.join(topicPath, f), dest)
-      simImport = { varName: simVarName, fileName: simFileName }
-      console.log(`  🎮  ${dir}：複製模擬 ${f} → ${simFileName}.jsx`)
-      break
-    }
+    const dest = path.join(SIMS_OUT, simFileName + '.jsx')
+    fs.copyFileSync(path.join(topicPath, f), dest)
+    simImport = { varName: simVarName, fileName: simFileName }
+    console.log(`  🎮  ${dir}：複製模擬 ${f} → ${simFileName}.jsx`)
+    break
   }
-  // Fallback：如果主題資料夾沒有 JSX，看 src/simulations/ 是否已有對應檔案
+
   if (!simImport) {
     const existingSim = path.join(SIMS_OUT, simFileName + '.jsx')
     if (fs.existsSync(existingSim)) {
@@ -110,9 +89,6 @@ for (const dir of topicDirs) {
   topicsData.push({ dir, comicEntries, simImport })
 }
 
-// ─── 產生 topicsConfig.js ────────────────────────────────────────────────────
-// configPath / existingConfig 已在上方宣告
-
 const importLines = topicsData
   .filter(t => t.simImport)
   .map(t => `import ${t.simImport.varName} from './simulations/${t.simImport.fileName}'`)
@@ -120,8 +96,6 @@ const importLines = topicsData
 
 const topicObjects = topicsData.map(({ dir, comicEntries, simImport }) => {
   const id = dir.toLowerCase().replace(/\s+/g, '-')
-  
-  // 嘗試從現有設定中抓取 metadata，若無則用預設值
   let subtitle = '', emoji = '📘', tag = '物理', tagColor = 'bg-indigo-600', description = '點擊查看漫畫與互動模擬。'
   
   if (existingConfig) {
@@ -173,4 +147,3 @@ export default topics
 
 fs.writeFileSync(configPath, config, 'utf8')
 console.log('\n✅ topicsConfig.js 已更新！')
-console.log('👉 接著執行 npm run build 產生網站\n')
