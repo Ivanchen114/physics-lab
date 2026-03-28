@@ -5,7 +5,7 @@ import React, { useState, useEffect, useRef } from 'react';
 // =============================================
 const H = 1;        // 普朗克常數
 const K = 1;        // 波茲曼常數
-const MAX_FREQ = 25; // X 軸最大頻率
+const MAX_FREQ = 50; // X 軸最大頻率 (從 25 加大到 50，避免高溫峰值被卡斷)
 const MAX_T = 10000; // 滑桿最大溫度
 
 // =============================================
@@ -38,21 +38,21 @@ const REGIONS = [
   {
     key: 'ir',
     label: '紅外線區', storyLabel: '便宜扭蛋',
-    start: 0,    end: 0.28,
+    start: 0,    end: 0.14, // 0 到 7 (7/50 = 0.14)
     color: 'rgba(255, 80, 50, 0.07)',
     textColor: 'rgba(255, 120, 80, 0.6)',
   },
   {
     key: 'vis',
     label: '可見光', storyLabel: '精緻公仔',
-    start: 0.28, end: 0.48,
+    start: 0.14, end: 0.24, // 7 到 12 (12/50 = 0.24)
     color: 'rgba(80, 220, 100, 0.07)',
     textColor: 'rgba(80, 220, 100, 0.6)',
   },
   {
     key: 'uv',
     label: '紫外線區', storyLabel: '天價限量',
-    start: 0.48, end: 1,
+    start: 0.24, end: 1, // 12 以上
     color: 'rgba(160, 80, 255, 0.07)',
     textColor: 'rgba(160, 80, 255, 0.6)',
   },
@@ -161,7 +161,7 @@ const BlackbodyAnimation = () => {
     ctx.setLineDash([]);
 
     // 「紫外災難」標註
-    const rjAnnotX = getX(MAX_FREQ * 0.38);
+    const rjAnnotX = getX(MAX_FREQ * 0.19); // 50 * 0.19 = 9.5，維持與之前相同的視覺位置
     ctx.fillStyle = 'rgba(220, 150, 150, 0.85)';
     ctx.font = 'bold 11px sans-serif';
     ctx.textAlign = 'left';
