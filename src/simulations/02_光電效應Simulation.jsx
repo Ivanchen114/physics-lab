@@ -39,7 +39,7 @@ function makeElectron(y, keMax) {
   return {
     x: 0,
     y,
-    vx: speed * Math.cos(angle),
+    vx: -speed * Math.cos(angle),
     vy: speed * Math.sin(angle),
     life: 0,
     maxLife: 80 + Math.random() * 40,
@@ -119,7 +119,7 @@ export default function PhotoelectricSimulation() {
     const H = canvas.height;
     canvasSizeRef.current = { W, H };
 
-    const METAL_X = Math.floor(W * 0.52);
+    const METAL_X = Math.floor(W * 0.75);
     const METAL_W = 18;
 
     // ── 🔴 優化 1：預先建立固定漸層，避免每幀重建 ──
@@ -232,7 +232,7 @@ export default function PhotoelectricSimulation() {
           addFlash(p.y);
           if (canEmit) {
             const e = makeElectron(p.y, keMax);
-            e.x = METAL_X + METAL_W / 2;
+            e.x = METAL_X - METAL_W / 2;
             electronsRef.current.push(e);
           }
           return false;
@@ -271,7 +271,7 @@ export default function PhotoelectricSimulation() {
         e.x   += e.vx;
         e.y   += e.vy;
         e.life++;
-        if (e.x > W || e.life > e.maxLife) return false;
+        if (e.x < -20 || e.life > e.maxLife) return false;
         const alpha = Math.max(0, 1 - e.life / e.maxLife);
         const eg = ctx.createRadialGradient(e.x, e.y, 0, e.x, e.y, 7);
         eg.addColorStop(0, `rgba(100,200,255,${alpha})`);
