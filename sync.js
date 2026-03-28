@@ -84,23 +84,26 @@ for (const dir of topicDirs) {
 
   // ── 複製 JSX 到 src/simulations/ ──
   let simImport = null
-  const simName = dir.replace(/\s+/g, '') + 'Simulation'
+  // 檔案名稱保留完整資料夾名（例如 01_黑體輻射Simulation.jsx）
+  const simFileName = dir.replace(/\s+/g, '') + 'Simulation'
+  // JS 識別符不能以數字開頭，移除前綴數字和底線（例如 "01_" → ""）
+  const simVarName = simFileName.replace(/^\d+_?/, '') + (simFileName.match(/^\d+_?/) ? '' : '')
   // 優先從主題資料夾找 JSX
   for (const f of jsxFiles) {
     if (f.toLowerCase().endsWith('.jsx')) {
-      const dest = path.join(SIMS_OUT, simName + '.jsx')
+      const dest = path.join(SIMS_OUT, simFileName + '.jsx')
       fs.copyFileSync(path.join(topicPath, f), dest)
-      simImport = simName
-      console.log(`  🎮  ${dir}：複製模擬 ${f} → ${simName}.jsx`)
+      simImport = { varName: simVarName, fileName: simFileName }
+      console.log(`  🎮  ${dir}：複製模擬 ${f} → ${simFileName}.jsx`)
       break
     }
   }
   // Fallback：如果主題資料夾沒有 JSX，看 src/simulations/ 是否已有對應檔案
   if (!simImport) {
-    const existingSim = path.join(SIMS_OUT, simName + '.jsx')
+    const existingSim = path.join(SIMS_OUT, simFileName + '.jsx')
     if (fs.existsSync(existingSim)) {
-      simImport = simName
-      console.log(`  🎮  ${dir}：沿用既有模擬 ${simName}.jsx`)
+      simImport = { varName: simVarName, fileName: simFileName }
+      console.log(`  🎮  ${dir}：沿用既有模擬 ${simFileName}.jsx`)
     }
   }
 
@@ -112,7 +115,7 @@ for (const dir of topicDirs) {
 
 const importLines = topicsData
   .filter(t => t.simImport)
-  .map(t => `import ${t.simImport} from './simulations/${t.simImport}'`)
+  .map(t => `import ${t.simImport.varName} from './simulations/${t.simImport.fileName}'`)
   .join('\n')
 
 const topicObjects = topicsData.map(({ dir, comicEntries, simImport }) => {
@@ -149,7 +152,7 @@ const topicObjects = topicsData.map(({ dir, comicEntries, simImport }) => {
     comics: [
 ${comics}
     ],
-    Simulation: ${simImport || 'null'},
+    Simulation: ${simImport ? simImport.varName : 'null'},
   }`
 }).join(',\n\n')
 
