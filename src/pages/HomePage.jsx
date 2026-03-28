@@ -69,37 +69,56 @@ export default function HomePage({ onSelectTopic }) {
       </main>
 
       {/* ── Production Credits Section ───────────────────── */}
-      <section className="bg-gray-900/30 border-t border-gray-800 py-12 px-6">
-        <div className="max-w-5xl mx-auto">
-          <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-widest mb-8 text-center">
-            製作團隊與工作流程 · Production Credits
-          </h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <CreditCard 
-              role="艾文 (Ivan)" 
-              tasks="決定主題、審核劇本、串接工具、專案發佈" 
-              icon="👨‍🏫"
-            />
-            <CreditCard 
-              role="Claude (AI)" 
-              tasks="劇本撰寫、互動模擬開發、網站架構整合" 
-              icon="🤖"
-            />
-            <CreditCard 
-              role="GPTs (AI)" 
-              tasks="劇本轉化為 Gemini 分鏡提示詞" 
-              icon="🧠"
-            />
-            <CreditCard 
-              role="Gemini (AI)" 
-              tasks="依分鏡提示詞生成高品質漫畫圖片" 
-              icon="🎨"
-            />
+      <section className="relative bg-[#05050A] border-t border-gray-800 py-20 px-6 overflow-hidden">
+        {/* 背景光暈 */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-32 bg-indigo-600/10 blur-[100px] pointer-events-none" />
+        
+        <div className="relative z-10 max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-xs font-black text-indigo-500 tracking-[0.3em] uppercase mb-2">
+              Production Workflow
+            </h2>
+            <p className="text-2xl md:text-3xl font-bold text-white tracking-tight">
+              一個 AI 協作的科普教學實驗
+            </p>
           </div>
-
-          <div className="mt-10 p-4 bg-indigo-500/5 rounded-lg border border-indigo-500/10 text-center text-xs text-gray-500 leading-relaxed">
-            這是一個 AI 協作實驗：從概念發想到分鏡生成，再到程式開發，我們用 AI 縮短了教學內容的研發路徑。
+          
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 md:gap-6">
+            <CreditNode 
+              step="01"
+              role="Ivan · 艾文" 
+              tasks="決定主題、策劃架構、最終審核與專案發佈" 
+              icon="👨‍🏫"
+              color="from-blue-500 to-cyan-400"
+            />
+            <CreditNode 
+              step="02"
+              role="NotebookLM" 
+              tasks="將龐雜的文本與解說音檔，萃取為結構化切段腳本" 
+              icon="📓"
+              color="from-emerald-500 to-teal-400"
+            />
+            <CreditNode 
+              step="03"
+              role="GPTs" 
+              tasks="導入《視覺規範》，將腳本精煉為 Gemini 專用提示詞" 
+              icon="⚙️"
+              color="from-amber-500 to-orange-400"
+            />
+            <CreditNode 
+              step="04"
+              role="Gemini" 
+              tasks="依據分鏡提示詞，生成高品質日系風格漫畫原畫" 
+              icon="🎨"
+              color="from-purple-500 to-pink-400"
+            />
+            <CreditNode 
+              step="05"
+              role="Claude" 
+              tasks="開發前台網頁、刻畫互動模擬器，與建置自動化腳本" 
+              icon="💻"
+              color="from-indigo-500 to-blue-400"
+            />
           </div>
         </div>
       </section>
@@ -189,12 +208,27 @@ function TopicCard({ topic, onClick }) {
   )
 }
 
-function CreditCard({ role, tasks, icon }) {
+// ── 流程節點卡片 ────────────────────────────────
+function CreditNode({ step, role, tasks, icon, color }) {
   return (
-    <div className="bg-gray-900/40 border border-white/5 rounded-xl p-6 hover:bg-gray-800/60 hover:border-white/10 transition-all duration-300 group">
-      <div className="text-3xl mb-4 group-hover:scale-110 transition-transform origin-left">{icon}</div>
-      <h3 className="text-white font-bold text-sm mb-2">{role}</h3>
-      <p className="text-gray-500 text-xs leading-relaxed font-light">{tasks}</p>
+    <div className="relative group">
+      {/* 步驟數字標記 */}
+      <div className="absolute -top-3 left-4 bg-[#05050A] px-2 text-[10px] font-black tracking-widest text-gray-600 group-hover:text-gray-300 z-10 transition-colors">
+        STEP {step}
+      </div>
+      
+      {/* 卡片本體 */}
+      <div className="relative h-full bg-gray-900/40 border border-white/5 rounded-xl p-6 pt-8 
+                      hover:bg-gray-800/50 transition-all duration-300
+                      hover:shadow-[0_0_30px_rgba(255,255,255,0.03)]
+                      flex flex-col">
+        {/* 頂部漸層光暈邊界 (隱藏於預設狀態，hover 時顯示) */}
+        <div className={`absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r ${color} opacity-0 group-hover:opacity-100 transition-opacity rounded-t-xl`} />
+        
+        <div className="text-3xl mb-4 group-hover:scale-110 transition-transform origin-left">{icon}</div>
+        <h3 className="text-white font-bold text-sm mb-2">{role}</h3>
+        <p className="text-gray-400 text-xs leading-relaxed font-light mt-auto">{tasks}</p>
+      </div>
     </div>
   )
 }
