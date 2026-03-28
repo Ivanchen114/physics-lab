@@ -58,7 +58,7 @@ export default function HomePage({ onSelectTopic }) {
           探索主題 · {topics.length} 個單元
         </h2>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {topics.map((topic) => (
             <TopicCard key={topic.id} topic={topic} onClick={() => onSelectTopic(topic)} />
           ))}
@@ -144,15 +144,13 @@ function TopicCard({ topic, onClick }) {
                  transition-all duration-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
     >
       {/* 預覽圖 (加上微光遮罩) */}
-      <div className="relative h-44 overflow-hidden bg-gray-950">
-        {comics?.[0] && (
-          <img
-            src={comics[0].file}
-            alt={title}
-            className="w-full h-full object-cover object-top opacity-80
-                       group-hover:scale-110 group-hover:opacity-100 transition-all duration-700"
-          />
-        )}
+      <div className="relative aspect-square overflow-hidden bg-gray-950">
+        <img
+          src={topic.cover || (comics?.[0]?.file || '')}
+          alt={title}
+          className="w-full h-full object-cover object-top opacity-80
+                     group-hover:scale-110 group-hover:opacity-100 transition-all duration-700"
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-transparent to-transparent opacity-60" />
         
         {/* emoji 標籤 */}
@@ -165,12 +163,16 @@ function TopicCard({ topic, onClick }) {
       </div>
 
       {/* 文字內容 */}
-      <div className="p-5">
-        <h3 className="text-xl font-bold text-white mb-1 group-hover:text-indigo-300 transition-colors">
-          {title}
-        </h3>
-        <p className="text-xs text-indigo-400/70 font-medium mb-3 tracking-widest uppercase">{subtitle}</p>
-        <p className="text-sm text-gray-400 leading-relaxed line-clamp-2 font-light">{description}</p>
+      <div className="p-6">
+        <div className="flex items-start justify-between mb-2">
+          <div>
+            <h3 className="text-2xl font-black text-white group-hover:text-indigo-300 transition-colors tracking-tight">
+              {title}
+            </h3>
+            <p className="text-sm text-indigo-400 font-bold tracking-[0.2em] uppercase mt-0.5">{subtitle}</p>
+          </div>
+        </div>
+        <p className="text-gray-400 text-sm leading-relaxed line-clamp-2 font-medium mt-4">{description}</p>
 
         {/* 漫畫格數標示 */}
         <div className="mt-5 pt-4 border-t border-white/5 flex items-center justify-between text-[10px] text-gray-500 font-bold tracking-widest uppercase">

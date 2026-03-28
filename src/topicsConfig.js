@@ -16,6 +16,7 @@ const topics = [
     tag: '量子物理',
     tagColor: 'bg-purple-600',
     description: '用園遊會扭蛋機類比，理解普朗克如何用「能量量子化」解決紫外災難，推開量子力學的大門。',
+    cover: '/covers/01_%E9%BB%91%E9%AB%94%E8%BC%BB%E5%B0%84.png',
     comics: [
     { file: './comics/01_黑體輻射/1.png', title: '黑體園遊會開場' },
     { file: './comics/01_黑體輻射/2.png', title: '高頻區為什麼機台特別多？' },
@@ -44,6 +45,7 @@ const topics = [
     tag: '量子物理',
     tagColor: 'bg-yellow-500',
     description: '用金屬夜店的類比，親眼見證波動說的失敗與光子說的誕生，理解為什麼光是一顆一顆的。',
+    cover: '/covers/02_%E5%85%89%E9%9B%BB%E6%95%88%E6%87%89.png',
     comics: [
     { file: './comics/02_光電效應/1.png', title: '金屬夜店裡，那些藍色小人呈現出來的是什麼？' },
     { file: './comics/02_光電效應/2.png', title: '電子不是不能動，而是被出口前的門檻擋住' },
@@ -72,6 +74,7 @@ const topics = [
     tag: '量子物理',
     tagColor: 'bg-cyan-600',
     description: '電子為什麼有干涉條紋？棒球為什麼沒有？用雙縫實驗親眼看懂量子世界的機率本質。',
+    cover: '/covers/03_%E7%89%A9%E8%B3%AA%E6%B3%A2.png',
     comics: [
     { file: './comics/03_物質波/1.png', title: '如果光可以像粒子，那電子會不會也像波？' },
     { file: './comics/03_物質波/2.png', title: '德布羅意的想法：只要有動量，就能對應一個波長' },
@@ -100,6 +103,7 @@ const topics = [
     tag: '量子物理',
     tagColor: 'bg-blue-600',
     description: '為什麼原子只發出特定顏色的光？從拉塞福的崩潰到波耳的能階，看見電子如何在微觀世界跳舞。',
+    cover: '/covers/04_%E5%8E%9F%E5%AD%90%E7%B7%9A%E8%AD%9C%E8%88%87%E9%87%8F%E5%AD%90%E6%85%8B.png',
     comics: [
     { file: './comics/04_原子線譜與量子態/1.png', title: '這支氣體管為什麼會發光？跟黑體輻射一樣嗎？' },
     { file: './comics/04_原子線譜與量子態/2.png', title: '黑體輻射整體熱輻射，氣體線譜是原子在放特定的光' },
@@ -128,6 +132,7 @@ const topics = [
     tag: '量子物理',
     tagColor: 'bg-slate-600',
     description: '拍得越清楚就真的知道越多嗎？理解海森堡的不確定性，發現那是微觀世界的內建規則，而非技術失敗。',
+    cover: '/covers/05_%E4%B8%8D%E7%A2%BA%E5%AE%9A%E6%80%A7%E5%8E%9F%E7%90%86.png',
     comics: [
     { file: './comics/05_不確定性原理/1.png', title: '拍得越清楚，就能知道得越多嗎？' },
     { file: './comics/05_不確定性原理/2.png', title: '快門開著時，照片裡看到的是點，還是軌跡？' },

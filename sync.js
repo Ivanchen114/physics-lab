@@ -44,9 +44,13 @@ for (const dir of topicDirs) {
   const topicPath = path.join(ROOT, dir)
   const files = fs.readdirSync(topicPath)
 
-  // ── 找 PNG 圖片，按名稱排序 ──
+  // ── 找 PNG 圖片，排除封面圖，按名稱排序 ──
   const pngs = files
-    .filter(f => f.toLowerCase().endsWith('.png'))
+    .filter(f => {
+      const isPng = f.toLowerCase().endsWith('.png');
+      const isCover = path.parse(f).name.toLowerCase() === 'cover';
+      return isPng && !isCover;
+    })
     .sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }))
 
   // ── 找 JSX 模擬檔 ──
@@ -61,16 +65,26 @@ for (const dir of topicDirs) {
   const comicsDir = path.join(COMICS_OUT, dir)
   fs.mkdirSync(comicsDir, { recursive: true })
 
-  // ── 複製 cover.png (如果有) ──
-  const coverSrc = path.join(topicPath, 'cover.png')
+  // ── 複製 cover.png / cover (如果有) ──
+  const possibleCovers = ['cover.png', 'cover.jpg', 'cover.jpeg', 'cover']
+  let coverSrc = null
+  for (const name of possibleCovers) {
+    const p = path.join(topicPath, name)
+    if (fs.existsSync(p)) {
+      coverSrc = p
+      break
+    }
+  }
+
   let coverRelPath = 'null'
-  if (fs.existsSync(coverSrc)) {
+  if (coverSrc) {
     const coversDir = path.join(__dirname, 'public', 'covers')
     if (!fs.existsSync(coversDir)) fs.mkdirSync(coversDir, { recursive: true })
-    const coverDest = path.join(coversDir, dir + '.png')
+    const ext = path.extname(coverSrc) || '.png'
+    const coverDest = path.join(coversDir, dir + ext)
     fs.copyFileSync(coverSrc, coverDest)
-    coverRelPath = `'/covers/${encodeURIComponent(dir)}.png'`
-    console.log(`  🖼  ${dir}：複製封面圖`)
+    coverRelPath = `'/covers/${encodeURIComponent(dir)}${ext}'`
+    console.log(`  🖼  ${dir}：複製封面圖 (${path.basename(coverSrc)})`)
   }
 
   // 從現有 config 取出這個主題的 comics 陣列（用於保留已手動設定的 title）
@@ -119,7 +133,7 @@ for (const dir of topicDirs) {
     }
   }
 
-  topicsData.push({ dir, comicEntries, simImport })
+  topicsData.push({ dir, comicEntries, simImport, coverRelPath })
 }
 
 // ─── 產生 topicsConfig.js ────────────────────────────────────────────────────
@@ -130,7 +144,7 @@ const importLines = topicsData
   .map(t => `import ${t.simImport.varName} from './simulations/${t.simImport.fileName}'`)
   .join('\n')
 
-const topicObjects = topicsData.map(({ dir, comicEntries, simImport }) => {
+const topicObjects = topicsData.map(({ dir, comicEntries, simImport, coverRelPath }) => {
   const id = dir.toLowerCase().replace(/\s+/g, '-')
   
   // 嘗試從現有設定中抓取 metadata，若無則用預設值
