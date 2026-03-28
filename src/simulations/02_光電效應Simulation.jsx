@@ -23,23 +23,32 @@ function getFreqInfo(f) {
 }
 
 // ─── 粒子工廠 ───────────────────────────────────────────
-function makePhoton(canvasH, color) {
+function makePhoton(canvasH, canvasW, color) {
+  const speed = 3.5 + Math.random() * 1.5;
+  const angle = Math.PI / 6; // 30 degrees down
+  const METAL_X = Math.floor(canvasW * 0.75);
+  const dy = METAL_X * Math.tan(angle); // drop amount
+  const minY = 30 - dy;
+  const maxY = canvasH - 30 - dy;
+  const yStart = minY + Math.random() * (maxY - minY);
+
   return {
-    x: 30,
-    y: 80 + Math.random() * (canvasH - 160),
-    vx: 2.5 + Math.random() * 1,
+    x: 0,
+    y: yStart,
+    vx: speed * Math.cos(angle),
+    vy: speed * Math.sin(angle),
     color,
     id: Math.random(),
   };
 }
 
-function makeElectron(y, keMax) {
-  const speed = 1.2 + keMax * 0.9;
-  const angle = (Math.random() - 0.5) * 1.2;
+function makeElectron(startX, startY, keMax) {
+  const speed = 1.0 + keMax * 0.8;
+  const angle = Math.PI - (Math.random() - 0.5) * Math.PI * 0.6; // random left-facing angle
   return {
-    x: 0,
-    y,
-    vx: -speed * Math.cos(angle),
+    x: startX,
+    y: startY,
+    vx: speed * Math.cos(angle),
     vy: speed * Math.sin(angle),
     life: 0,
     maxLife: 80 + Math.random() * 40,
@@ -129,10 +138,6 @@ export default function PhotoelectricSimulation() {
     bgGrad.addColorStop(0.48, "#0a0a18");
     bgGrad.addColorStop(1,    "#040410");
 
-    const srcGrad = ctx.createRadialGradient(20, H / 2, 0, 20, H / 2, 60);
-    srcGrad.addColorStop(0, freqInfo.color + "88");
-    srcGrad.addColorStop(1, "transparent");
-
     const mGrad = ctx.createLinearGradient(METAL_X - METAL_W / 2, 0, METAL_X + METAL_W / 2, 0);
     mGrad.addColorStop(0,   "#000");
     mGrad.addColorStop(0.3, METALS[metalKey].color + "CC");
@@ -143,8 +148,16 @@ export default function PhotoelectricSimulation() {
       ctx.fillStyle = bgGrad;
       ctx.fillRect(0, 0, W, H);
 
-      ctx.fillStyle = srcGrad;
-      ctx.fillRect(0, 0, 80, H);
+      // 光束斜向背景
+      ctx.fillStyle = freqInfo.color + "15"; // 非常淡的顏色
+      ctx.beginPath();
+      const angle = Math.PI / 6;
+      const dy = METAL_X * Math.tan(angle);
+      ctx.moveTo(0, 30 - dy);
+      ctx.lineTo(METAL_X, 30);
+      ctx.lineTo(METAL_X, H - 30);
+      ctx.lineTo(0, H - 30 - dy);
+      ctx.fill();
 
       // 金屬閃光效果（切換時）
       if (metalFlashRef.current > 0) {
@@ -222,31 +235,37 @@ export default function PhotoelectricSimulation() {
 
       const interval = Math.max(4, Math.floor(50 / (intensity / 20)));
       if (f % interval === 0) {
-        photonsRef.current.push(makePhoton(H, freqInfo.color));
+        photonsRef.current.push(makePhoton(H, W, freqInfo.color));
       }
 
       // ── 繪製光子 ──
       photonsRef.current = photonsRef.current.filter(p => {
         p.x += p.vx;
-        if (p.x >= METAL_X - METAL_W / 2) {
-          addFlash(p.y);
-          if (canEmit) {
-            const e = makeElectron(p.y, keMax);
-            e.x = METAL_X - METAL_W / 2;
-            electronsRef.current.push(e);
+        p.y += p.vy;
+        if (p.x >= METAL_X - METAL_W / 2 || p.y > H || p.y < -100) {
+          if (p.x >= METAL_X - METAL_W / 2 && p.y > 20 && p.y < H - 20) {
+            addFlash(p.y);
+            if (canEmit) {
+              const e = makeElectron(METAL_X - METAL_W / 2, p.y, keMax);
+              electronsRef.current.push(e);
+            }
           }
           return false;
         }
-        const glow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, 8);
-        glow.addColorStop(0, freqInfo.color + "CC");
-        glow.addColorStop(1, "transparent");
-        ctx.fillStyle = glow;
+        // 光子特徵：帶有方向性的線段(波包)
+        ctx.strokeStyle = p.color;
+        ctx.globalAlpha = 0.8;
+        ctx.lineWidth = 2.5;
+        ctx.lineCap = "round";
         ctx.beginPath();
-        ctx.arc(p.x, p.y, 8, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+        ctx.moveTo(p.x, p.y);
+        ctx.lineTo(p.x - p.vx * 3, p.y - p.vy * 3);
+        ctx.stroke();
+        ctx.globalAlpha = 1.0;
+        
         ctx.fillStyle = "#fff";
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 1.5, 0, Math.PI * 2);
         ctx.fill();
         return true;
       });
@@ -274,16 +293,26 @@ export default function PhotoelectricSimulation() {
         if (e.x < -20 || e.life > e.maxLife) return false;
         const alpha = Math.max(0, 1 - e.life / e.maxLife);
         const eg = ctx.createRadialGradient(e.x, e.y, 0, e.x, e.y, 7);
-        eg.addColorStop(0, `rgba(100,200,255,${alpha})`);
+        eg.addColorStop(0, `rgba(50, 150, 255, ${alpha})`);
         eg.addColorStop(1, "transparent");
         ctx.fillStyle = eg;
         ctx.beginPath();
         ctx.arc(e.x, e.y, 7, 0, Math.PI * 2);
         ctx.fill();
+        
+        // 實體核心加負號 (-) 以區別光子
+        ctx.fillStyle = `rgba(200, 230, 255, ${alpha})`;
         ctx.beginPath();
-        ctx.arc(e.x, e.y, 2.5, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(220,240,255,${alpha})`;
+        ctx.arc(e.x, e.y, 3, 0, Math.PI * 2);
         ctx.fill();
+        
+        ctx.strokeStyle = `rgba(0, 50, 150, ${alpha})`;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(e.x - 1.5, e.y);
+        ctx.lineTo(e.x + 1.5, e.y);
+        ctx.stroke();
+
         return true;
       });
 
