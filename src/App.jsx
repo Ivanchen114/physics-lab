@@ -9,7 +9,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-gray-950 text-white">
       {currentTopic
-        ? <TopicPage topic={currentTopic} onBack={() => setCurrentTopic(null)} />
+        ? <TopicPage topic={currentTopic} onBack={() => setCurrentTopic(null)} onSelectTopic={setCurrentTopic} />
         : <HomePage onSelectTopic={setCurrentTopic} />
       }
     </div>
